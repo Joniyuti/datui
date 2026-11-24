@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>ドリーム・ジャン・ヒロインズ 4P DX</title>
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bg-deep: #070412;
+    --panel-bg: rgba(18, 10, 34, 0.96);
+    --panel-border: rgba(244, 114, 182, 0.52);
+    --sakura: #f472b6;
+    --rose: #fb7185;
+    --gold: #facc15;
+    --cyan: #38bdf8;
+    --jade: #0f4432;
+    --ivory: #fffdf7;
+    --text-main: #fdf4ff;
+    --text-sub: #e9d5ff;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100dvh;
+    background: radial-gradient(circle at 50% 18%, #2e1052 0%, #110722 60%, #05020c 100%);
+    color: var(--text-main);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* PC Companion Guides (Shown at >= 980px, hidden on mobile) */
+  .pc-side-card {
+    display: none;
+    width: 262px;
+    max-height: calc(100dvh - 28px);
+    background: rgba(18, 10, 34, 0.95);
+    border: 1.5px solid rgba(244, 114, 182, 0.5);
+    border-radius: 12px;
+    padding: 13px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.82);
+    flex-direction: column;
+    gap: 6px;
+    font-size: 11.8px;
+    line-height: 1.42;
+  }
+
+  @media (min-width: 980px) {
+    .pc-side-card {
+      display: flex;
+    }
+  }
+
+  .pc-side-title {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(244, 114, 182, 0.35);
+    padding-bottom: 4px;
+  }
+
+  .key-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 2px 0;
+    border-bottom: 1px dashed rgba(233, 213, 255, 0.16);
+  }
+
+  .kbadge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #2e1065;
+    border: 1px solid var(--sakura);
+    color: #fef08a;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 10.2px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  /* Strict 9:16 Portrait Container with Mobile Browser Safe-Area Isolation */
+  #game-frame {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    width: min(100vw, calc((100dvh - var(--safe-top) - var(--safe-bottom)) * 9 / 16));
+    height: min(calc(100dvh - var(--safe-top) - var(--safe-bottom)), calc(100vw * 16 / 9));
+    max-height: 100dvh;
+    margin-top: var(--safe-top);
+    margin-bottom: var(--safe-bottom);
+    background: linear-gradient(180deg, #1b0e34 0%, #0a0516 100%);
+    border: 2px solid rgba(244, 114, 182, 0.68);
+    box-shadow: 0 0 60px rgba(236, 72, 153, 0.22), 0 0 70px rgba(0, 0, 0, 0.96);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    container-type: inline-size;
+  }
+
+  /* Top Header: Round, Wind, Dora, Wall & 4-Player Scores */
+  #top-hud {
+    flex: 0 0 auto;
+    background: linear-gradient(180deg, #2b1352 0%, #130826 100%);
+    border-bottom: 1.5px solid rgba(250, 204, 21, 0.45);
+    padding: clamp(4px, 1cqw, 7px) clamp(7px, 1.8cqw, 11px);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    z-index: 25;
+  }
+
+  .hud-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: clamp(9.5px, 2.35cqw, 12.5px);
+    font-weight: 900;
+  }
+
+  #hud-round-label {
+    color: var(--gold);
+  }
+
+  #hud-dora-wrap {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #fbcfe8;
+    font-size: clamp(8.8px, 2.1cqw, 11.5px);
+  }
+
+  .scores-4p-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+
+  .seat-score-chip {
+    background: rgba(12, 6, 24, 0.85);
+    border: 1px solid rgba(244, 114, 182, 0.35);
+    border-radius: 5px;
+    padding: 2px 3px;
+    text-align: center;
+    font-size: clamp(8px, 1.95cqw, 10.5px);
+    line-height: 1.15;
+    font-weight: 800;
+  }
+
+  .seat-score-chip.active-turn {
+    border-color: var(--gold);
+    background: rgba(146, 64, 14, 0.35);
+  }
+
+  .seat-score-chip.riichi-on {
+    box-shadow: inset 0 0 0 1px #fb7185;
+  }
+
+  /* 4-Player Table Canvas (Heroines, Face-down AI Hands, Rivers & Melds) */
+  #table-canvas-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    padding: clamp(3px, 0.8cqw, 6px);
+  }
+
+  #table-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    border: 1.5px solid rgba(250, 204, 21, 0.32);
+    display: block;
+  }
+
+  /* Player Hand & Call Controls Dock */
+  #player-deck-panel {
+    flex: 0 0 auto;
+    background: linear-gradient(180deg, #1a0b33 0%, #0b0518 100%);
+    border-top: 1.5px solid rgba(244, 114, 182, 0.5);
+    padding: clamp(4px, 1cqw, 7px) clamp(6px, 1.5cqw, 9px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.95cqw, 6px);
+    z-index: 25;
+  }
+
+  .status-banner-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: clamp(9px, 2.2cqw, 11.8px);
+    font-weight: 800;
+    color: #fde68a;
+  }
+
+  .call-bar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  .call-btn {
+    padding: clamp(5px, 1.2cqw, 7px) 1px;
+    border-radius: 6px;
+    border: 1.2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(24, 13, 46, 0.92);
+    color: #94a3b8;
+    font-size: clamp(8.5px, 2.05cqw, 11px);
+    font-weight: 900;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .call-btn.enabled {
+    color: #ffffff;
+    border-color: #fef08a;
+    background: linear-gradient(180deg, #db2777 0%, #9d174d 100%);
+    box-shadow: 0 0 8px rgba(244, 114, 182, 0.5);
+  }
+
+  .call-btn.discard-btn.enabled {
+    background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+    color: #fef9c3;
+  }
+
+  /* Player Hand Canvas (Crisp Canvas-Drawn Mahjong Tiles) */
+  #hand-canvas-wrap {
+    width: 100%;
+    height: clamp(46px, 11.6cqw, 62px);
+    position: relative;
+  }
+
+  #hand-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: manipulation;
+  }
+
+  /* Bottom Virtual Cursor & System Row (Safe from Mobile Browser Chrome) */
+  #bottom-nav-dock {
+    flex: 0 0 auto;
+    background: #080412;
+    border-top: 1px solid rgba(244, 114, 182, 0.35);
+    padding: clamp(4px, 1cqw, 7px) clamp(6px, 1.5cqw, 9px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 25;
+  }
+
+  .cursor-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 4px;
+  }
+
+  .nav-btn {
+    padding: clamp(5px, 1.2cqw, 7px) 4px;
+    border-radius: 6px;
+    border: 1.2px solid rgba(244, 114, 182, 0.5);
+    background: linear-gradient(180deg, #351461 0%, #18082e 100%);
+    color: #fdf4ff;
+    font-size: clamp(9.5px, 2.3cqw, 12px);
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .sys-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .sys-btn {
+    background: #140926;
+    border: 1px solid rgba(233, 213, 255, 0.32);
+    border-radius: 6px;
+    padding: clamp(3.5px, 0.85cqw, 5.5px) 2px;
+    color: #f3e8ff;
+    font-size: clamp(8.5px, 2.05cqw, 10.8px);
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.15;
+    cursor: pointer;
+  }
+
+  .sys-key {
+    font-size: clamp(7.2px, 1.7cqw, 9px);
+    color: #f9a8d4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  /* Overlay Screens (Title, Agari/Draw Result, Save/Load, Guide, Menu) */
+  .overlay-screen {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 18%, rgba(236, 72, 153, 0.24) 0%, rgba(15, 7, 30, 0.98) 62%, #06030e 100%);
+    z-index: 45;
+    display: none;
+    flex-direction: column;
+    padding: clamp(10px, 2.5cqw, 16px);
+    gap: clamp(8px, 1.8cqw, 11px);
+    overflow-y: auto;
+  }
+
+  .overlay-screen.active {
+    display: flex;
+  }
+
+  #title-screen {
+    z-index: 55;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .crest-bar {
+    height: 4px;
+    width: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f472b6 0%, #facc15 50%, #38bdf8 100%);
+  }
+
+  .title-logo {
+    font-size: clamp(18px, 4.6cqw, 25px);
+    font-weight: 900;
+    line-height: 1.18;
+    margin: 4px 0;
+    background: linear-gradient(180deg, #ffffff 0%, #fbcfe8 52%, #facc15 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .card-panel {
+    background: rgba(24, 12, 46, 0.95);
+    border: 1.5px solid rgba(244, 114, 182, 0.45);
+    border-radius: 10px;
+    padding: clamp(8px, 2cqw, 12px);
+    text-align: left;
+    font-size: clamp(10.5px, 2.55cqw, 13px);
+    line-height: 1.46;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: clamp(9px, 2.15cqw, 12px) 10px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(244, 114, 182, 0.55);
+    background: linear-gradient(180deg, #3b1768 0%, #18092e 100%);
+    color: #ffffff;
+    font-size: clamp(11.5px, 2.85cqw, 14.5px);
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .action-btn.pink-primary {
+    background: linear-gradient(180deg, #db2777 0%, #9d174d 100%);
+    border-color: #fef08a;
+    color: #fef9c3;
+  }
+
+  .action-btn.gold-btn {
+    background: linear-gradient(180deg, #b45309 0%, #78350f 100%);
+    border-color: var(--gold);
+    color: #fef08a;
+  }
+
+  .action-btn.danger-btn {
+    background: linear-gradient(180deg, #be123c 0%, #4c0519 100%);
+    border-color: #fda4af;
+    color: #ffe4e6;
+  }
+
+  .screen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1.5px solid rgba(244, 114, 182, 0.45);
+    padding-bottom: 6px;
+  }
+
+  .screen-title {
+    font-size: clamp(13px, 3.2cqw, 17px);
+    font-weight: 900;
+    color: var(--gold);
+  }
+
+  .mini-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(244, 114, 182, 0.55);
+    background: #28114a;
+    color: #fdf4ff;
+    font-size: clamp(10px, 2.5cqw, 13px);
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .mini-btn.gold {
+    background: #92400e;
+    border-color: #facc15;
+    color: #fef08a;
+  }
+
+  .mini-btn.danger {
+    background: #881337;
+    border-color: #fda4af;
+  }
+
+  #toast-banner {
+    position: absolute;
+    top: 56px;
+    left: 12px;
+    right: 12px;
+    background: rgba(22, 10, 44, 0.98);
+    border: 1.5px solid var(--gold);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: clamp(10.5px, 2.6cqw, 13.5px);
+    font-weight: 900;
+    color: #fef08a;
+    text-align: center;
+    z-index: 75;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+  }
+
+  #toast-banner.show {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+  <!-- PC Left Companion Controls & Rules Reference -->
+  <aside class="pc-side-card" aria-label="PCキーボード操作ガイド">
+    <div class="pc-side-title">⌨ PCキーボード操作ガイド</div>
+    <div class="key-row"><span>手牌カーソル移動</span><span class="kbadge">← / → (A / D)</span></div>
+    <div class="key-row"><span>選択牌を打牌</span><span class="kbadge">Enter / Space</span></div>
+    <div class="key-row"><span>ツモ / ロン宣言</span><span class="kbadge">T / R</span></div>
+    <div class="key-row"><span>リーチ宣言（厳格判定）</span><span class="kbadge">L</span></div>
+    <div class="key-row"><span>ポン / チー / カン</span><span class="kbadge">P / C / V</span></div>
+    <div class="key-row"><span>4人状態確認（衣装・点数）</span><span class="kbadge">I</span></div>
+    <div class="key-row"><span>セーブ / ロード</span><span class="kbadge">K / O</span></div>
+    <div class="key-row"><span>ルール図鑑 / メニュー</span><span class="kbadge">H / Esc</span></div>
+    <div class="key-row"><span>サウンド ON / OFF</span><span class="kbadge">M</span></div>
+    <div class="pc-side-title" style="margin-top:4px;">👗 点棒脱ぎ＆着せ替えルール</div>
+    <div style="font-size:11px;color:#fbcfe8;">
+      アガリ精算で<b>点棒を払う人は脱ぐ（衣装+1）</b>、<b>点棒を受け取る人は着る（衣装-1、最小0）</b>！ 全部脱いだら<b>ビリ確定＆全体勝負終了</b>！
+    </div>
+  </aside>
+
+  <!-- Main 9:16 Portrait Game Frame -->
+  <main id="game-frame">
+    <div id="toast-banner" role="status" aria-live="polite"></div>
+
+    <!-- Top Match & 4-Player Score HUD -->
+    <header id="top-hud">
+      <div class="hud-top-row">
+        <span id="hud-round-label">東1局 ・ 0本場</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button id="btn-hud-4p-status" type="button" class="mini-btn gold" style="padding:2px 7px;font-size:clamp(8.5px,2cqw,11px);">👥 4人状態[I]</button>
+          <div id="hud-dora-wrap">
+            <span>ドラ:</span>
+            <canvas id="hud-dora-canvas" style="width:20px;height:28px;border-radius:4px;"></canvas>
+            <span id="hud-wall-count">山:70</span>
+          </div>
+        </div>
+      </div>
+      <div id="scores-4p-grid" class="scores-4p-grid"></div>
+    </header>
+
+    <!-- 4-Player Table Canvas (Heroines, Face-down AI Hands, Rivers & Melds) -->
+    <section id="table-canvas-wrap">
+      <canvas id="table-canvas"></canvas>
+    </section>
+
+    <!-- Player Call Actions & Crisp Canvas Hand -->
+    <section id="player-deck-panel">
+      <div class="status-banner-line">
+        <span id="hud-turn-msg">あなたの番：牌を選んで打牌</span>
+        <span id="hud-waits-msg" style="color:#7dd3fc;"></span>
+      </div>
+
+      <div class="call-bar">
+        <button id="btn-tsumo" type="button" class="call-btn">ツモ[T]</button>
+        <button id="btn-ron" type="button" class="call-btn">ロン[R]</button>
+        <button id="btn-riichi" type="button" class="call-btn">リーチ[L]</button>
+        <button id="btn-pon" type="button" class="call-btn">ポン[P]</button>
+        <button id="btn-chi" type="button" class="call-btn">チー[C]</button>
+        <button id="btn-kan" type="button" class="call-btn">カン[V]</button>
+        <button id="btn-discard" type="button" class="call-btn discard-btn enabled">打牌[Enter]</button>
+      </div>
+
+      <div id="hand-canvas-wrap">
+        <canvas id="hand-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- Bottom Virtual Cursor & System Dock (Safe above Mobile Chrome UI) -->
+    <footer id="bottom-nav-dock">
+      <div class="cursor-row">
+        <button id="btn-left" type="button" class="nav-btn">◀ 左 [←]</button>
+        <button id="btn-right" type="button" class="nav-btn">右 [→] ▶</button>
+        <button id="btn-tap-discard" type="button" class="nav-btn" style="background:linear-gradient(180deg,#be185d 0%,#831843 100%);border-color:#fde047;">🀄 選択牌を切る</button>
+      </div>
+      <div class="sys-row">
+        <button id="btn-pass" type="button" class="sys-btn"><span>⏭ スキップ</span><span class="sys-key">鳴き見送り</span></button>
+        <button id="btn-4p-status" type="button" class="sys-btn"><span>👥 4人状態</span><span class="sys-key">[I]</span></button>
+        <button id="btn-save" type="button" class="sys-btn"><span>💾 セーブ</span><span class="sys-key">[K]</span></button>
+        <button id="btn-load" type="button" class="sys-btn"><span>📂 ロード</span><span class="sys-key">[O]</span></button>
+        <button id="btn-menu" type="button" class="sys-btn"><span>☰ メニュー</span><span class="sys-key">[Esc]</span></button>
+      </div>
+    </footer>
+
+    <!-- 1. TITLE SCREEN -->
+    <div id="title-screen" class="overlay-screen active">
+      <div>
+        <div class="crest-bar"></div>
+        <div style="margin-top:6px;font-size:clamp(9.5px,2.3cqw,12px);font-weight:900;color:#f9a8d4;letter-spacing:0.8px;">
+          4-PLAYER RIICHI MAHJONG × TENBOU DRESS RULE
+        </div>
+        <h1 class="title-logo">ドリーム・ジャン・ヒロインズ<br>4P DX</h1>
+      </div>
+
+      <canvas id="title-cast-canvas" style="width:100%;height:146px;border-radius:10px;border:1.5px solid var(--sakura);"></canvas>
+
+      <div class="card-panel" style="font-size:11px;padding:8px 10px;">
+        ・<b>本格4人麻雀（136牌・赤5牌・嶺上牌・ドラ）：</b>東南西北4席・各25,000点スタート。リーチ条件（門前・1,000点・残り4枚以上・打牌後テンパイ）を厳格判定！<br>
+        ・<b>ポン・チー・暗槓・明槓・加槓：</b>カンで嶺上牌ツモ＆新ドラめくり。他家手牌は裏牌表示（透けなし）、全4家の河・副露を表示！<br>
+        ・<b>点棒脱ぎ＆着る劇場演出：</b>点棒を払う人は<b>脱ぐ（+1）</b>、受け取る人は<b>着る（-1）</b>！ <b>全部脱いだらビリ確定＆全体勝負終了</b>！
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button id="btn-start-4p" type="button" class="action-btn pink-primary">🀄 4人麻雀 対局開始！ <span class="kbadge">Enter</span></button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <button id="btn-title-load" type="button" class="action-btn gold-btn">📂 続きから再開 <span class="kbadge">O</span></button>
+          <button id="btn-title-guide" type="button" class="action-btn">📖 役・ルール解説 <span class="kbadge">H</span></button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <button id="btn-title-sound" type="button" class="action-btn" style="padding:6px;font-size:11.5px;">🔊 サウンド: ON <span class="kbadge">M</span></button>
+          <button id="btn-title-del" type="button" class="action-btn danger-btn" style="padding:6px;font-size:11.5px;">🗑 セーブデータ削除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DEDICATED THEATRICAL DRESS / UNDRESS SCENE SCREEN -->
+    <div id="dress-scene-screen" class="overlay-screen" style="z-index:52;background:radial-gradient(circle at 50% 35%, rgba(244,114,182,0.28) 0%, rgba(16,6,34,0.98) 65%, #05020b 100%);">
+      <div class="screen-header">
+        <span id="dress-scene-header" class="screen-title">✨ 衣装チェンジ劇場演出</span>
+        <button id="btn-dress-skip" type="button" class="mini-btn gold">次へ / スキップ ▶</button>
+      </div>
+
+      <canvas id="dress-stage-canvas" style="width:100%;flex:1 1 auto;min-height:220px;border-radius:12px;border:1.5px solid var(--gold);"></canvas>
+
+      <div class="card-panel" style="display:flex;flex-direction:column;gap:5px;">
+        <div id="dress-item-headline" style="font-size:clamp(13px,3.3cqw,17px);font-weight:900;color:#fef08a;"></div>
+        <div id="dress-detail-sub" style="font-size:clamp(11px,2.7cqw,13.5px);color:#fbcfe8;"></div>
+        <div id="dress-progress-bar" style="font-size:11px;color:#7dd3fc;"></div>
+      </div>
+
+      <button id="btn-dress-next" type="button" class="action-btn pink-primary">演出を進める <span class="kbadge">Enter</span></button>
+    </div>
+
+    <!-- 3. ROUND / AGARI / RYUUKYOKU / FINAL MATCH RESULT SCREEN -->
+    <div id="result-screen" class="overlay-screen">
+      <div class="screen-header">
+        <span id="result-title" class="screen-title">🎉 和了精算＆衣装変動</span>
+        <button id="btn-result-next-top" type="button" class="mini-btn gold">次の局へ ▶</button>
+      </div>
+      <div id="result-body" class="card-panel" style="flex:1 1 auto;display:flex;flex-direction:column;gap:8px;justify-content:center;"></div>
+      <button id="btn-result-next" type="button" class="action-btn pink-primary">次の局へ進む <span class="kbadge">Enter</span></button>
+    </div>
+
+    <!-- 4. LIVE 4-PLAYER STATUS SCREEN (POINTS, RANK, GARMENTS & REMOVED ITEMS) -->
+    <div id="status-4p-screen" class="overlay-screen">
+      <div class="screen-header">
+        <span class="screen-title">👥 4人卓ステータス（点数・順位・着用/脱衣状況）</span>
+        <button id="btn-close-4p-status" type="button" class="mini-btn">✕ 閉じる [Esc]</button>
+      </div>
+      <div id="status-4p-cards" style="display:flex;flex-direction:column;gap:7px;"></div>
+    </div>
+
+    <!-- 5. SAVE / LOAD / DELETE SCREEN -->
+    <div id="save-screen" class="overlay-screen">
+      <div class="screen-header">
+        <span id="save-title" class="screen-title">💾 セーブ・データ管理</span>
+        <button id="btn-close-save" type="button" class="mini-btn">✕ 閉じる [Esc]</button>
+      </div>
+      <div id="save-slots-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <div style="margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,0.14);">
+        <button id="btn-delete-all-saves" type="button" class="action-btn danger-btn">🗑 すべてのセーブデータを削除する</button>
+      </div>
+    </div>
+
+    <!-- 6. RULES & YAKU GUIDE -->
+    <div id="guide-screen" class="overlay-screen">
+      <div class="screen-header">
+        <span class="screen-title">📖 4人麻雀ルール・リーチ条件・役一覧</span>
+        <button id="btn-close-guide" type="button" class="mini-btn">✕ 閉じる [Esc]</button>
+      </div>
+      <div id="guide-body" class="card-panel" style="display:flex;flex-direction:column;gap:7px;"></div>
+    </div>
+
+    <!-- 7. SYSTEM MENU -->
+    <div id="menu-screen" class="overlay-screen">
+      <div class="screen-header">
+        <span class="screen-title">☰ 対局システムメニュー</span>
+        <button id="btn-close-menu" type="button" class="mini-btn">✕ 戻る [Esc]</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+        <button id="btn-menu-sound" type="button" class="action-btn gold-btn">🔊 サウンド: ON [M]</button>
+        <button id="btn-menu-rematch" type="button" class="action-btn">🔄 最初からやり直す</button>
+      </div>
+      <div class="card-panel">
+        <div style="color:var(--gold);font-weight:900;margin-bottom:4px;">◆ 点棒脱ぎ＆着せ替えルール概要</div>
+        ・アガリ発生時、点棒を支払ったプレイヤーは衣装ステージが<b>+1</b>、点棒を受け取ったプレイヤーは衣装ステージが<b>-1（最小0）</b>になります。<br>
+        ・誰かの持ち点が0以下になると、その時点で最終精算＆リセット再戦となります。
+      </div>
+      <button id="btn-menu-title" type="button" class="action-btn danger-btn">🏠 タイトル画面へ戻る</button>
+    </div>
+  </main>
+
+  <!-- PC Right Companion 4 Heroines & Outfit Status -->
+  <aside class="pc-side-card" aria-label="4人卓ヒロイン＆衣装ステージ">
+    <div class="pc-side-title">💖 4人卓ヒロイン＆衣装ステージ</div>
+    <div id="pc-4p-roster" style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;"></div>
+    <div class="pc-side-title" style="margin-top:4px;">👗 全部脱いだらビリ確定＆終了</div>
+    <div style="font-size:11px;color:#fda4af;">
+      4段階すべて脱いで<b>完全脱衣（STAGE 4）</b>に達したプレイヤーは即座に<b>ビリ確定＆全体勝負終了</b>となります！
+    </div>
+  </aside>
+
+<script>
+(() => {
+  'use strict';
+
+  const SAVE_KEY = 'dream_jan_heroines_4p_dx_saves_v1';
+  const MAX_SLOTS = 3;
+  const MAX_OUTFIT_STAGE = 4; // 0 = full outfit, 4 = completely stripped (全部脱いだ状態)
+
+  /* =========================================================
+     1. TILE SYSTEM & NAMED GARMENT LAYERS PER HEROINE
+     ========================================================= */
+  const WIND_CHARS = { 31: '東', 32: '南', 33: '西', 34: '北' };
+  const DRAGON_CHARS = { 35: '白', 36: '發', 37: '中' };
+  const KANJI_DIGITS = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+  const ALL_34_CODES = [
+    1,2,3,4,5,6,7,8,9,
+    11,12,13,14,15,16,17,18,19,
+    21,22,23,24,25,26,27,28,29,
+    31,32,33,34,35,36,37
+  ];
+  const KOKUSHI_CODES = new Set([1, 9, 11, 19, 21, 29, 31, 32, 33, 34, 35, 36, 37]);
+
+  // Each seat has 4 removable layers (index 0..3):
+  // Removing layer k transitions outfitStage from k -> k+1 (reaching stage 4 = completely stripped).
+  // Putting layer back on transitions outfitStage from k -> k-1.
+  const SEAT_META = [
+    {
+      seat: 0,
+      name: 'あなた（南）',
+      wind: 32,
+      isHuman: true,
+      hair: '#f472b6',
+      eye: '#be185d',
+      suitA: '#fdf2f8',
+      suitB: '#ec4899',
+      garments: ['パレードジャケット', 'フリルベスト', 'プリーツスカート', 'スパッツ＆インナー']
+    },
+    {
+      seat: 1,
+      name: '姫宮ミコト（東）',
+      wind: 31,
+      isHuman: false,
+      hair: '#fb7185',
+      eye: '#9f1239',
+      suitA: '#ffe4e6',
+      suitB: '#e11d48',
+      garments: ['ロイヤルケープ', 'ローズブラウス', '令嬢フレアスカート', 'シルクスリップ']
+    },
+    {
+      seat: 2,
+      name: '白銀ヒナタ（北）',
+      wind: 34,
+      isHuman: false,
+      hair: '#e2e8f0',
+      eye: '#0284c7',
+      suitA: '#e0f2fe',
+      suitB: '#0284c7',
+      garments: ['ナイトコート', 'サマーカーディガン', 'ショートパンツ', 'アイスキャミソール']
+    },
+    {
+      seat: 3,
+      name: '桜庭アリス（西）',
+      wind: 33,
+      isHuman: false,
+      hair: '#facc15',
+      eye: '#16a34a',
+      suitA: '#fef9c3',
+      suitB: '#ea580c',
+      garments: ['サンシャインパーカー', 'ビタミンTシャツ', 'デニムミニスカ', 'トロピカルインナー']
+    }
+  ];
+
+  function getRemainingGarments(seatIdx, outfitStage) {
+    const meta = SEAT_META[seatIdx];
+    if (!meta) return [];
+    return meta.garments.slice(outfitStage);
+  }
+
+  function getRemovedGarments(seatIdx, outfitStage) {
+    const meta = SEAT_META[seatIdx];
+    if (!meta) return [];
+    return meta.garments.slice(0, outfitStage);
+  }
+
+  function isSimpleCode(code) {
+    if (code >= 31) return false;
+    const n = code % 10;
+    return n >= 2 && n <= 8;
+  }
+
+  function tileLabel(code) {
+    if (code >= 1 && code <= 9) return `${KANJI_DIGITS[code]}萬`;
+    if (code >= 11 && code <= 19) return `${KANJI_DIGITS[code - 10]}筒`;
+    if (code >= 21 && code <= 29) return `${KANJI_DIGITS[code - 20]}索`;
+    return WIND_CHARS[code] || DRAGON_CHARS[code] || '牌';
+  }
+
+  // Advances a dora indicator tile code to its corresponding active dora tile code:
+  // Manzu/Pinzu/Souzu: 1->2..8->9, 9->1 (and +10/+20 for pin/sou)
+  // Winds: 31(東)->32(南)->33(西)->34(北)->31(東)
+  // Dragons: 35(白)->36(發)->37(中)->35(白)
+  function nextDoraCode(indicatorCode) {
+    const c = Number(indicatorCode);
+    if (!Number.isFinite(c)) return 1;
+    if (c >= 1 && c <= 8) return c + 1;
+    if (c === 9) return 1;
+    if (c >= 11 && c <= 18) return c + 1;
+    if (c === 19) return 11;
+    if (c >= 21 && c <= 28) return c + 1;
+    if (c === 29) return 21;
+    if (c >= 31 && c <= 33) return c + 1;
+    if (c === 34) return 31;
+    if (c >= 35 && c <= 36) return c + 1;
+    if (c === 37) return 35;
+    return c;
+  }
+
+  function build136Deck() {
+    const deck = [];
+    let uid = 1;
+    for (const code of ALL_34_CODES) {
+      for (let k = 0; k < 4; k++) {
+        const isRed = (code === 5 || code === 15 || code === 25) && k === 0;
+        deck.push({ uid: uid++, code, red: isRed });
+      }
+    }
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    return deck;
+  }
+
+  function sortTiles(tiles) {
+    return [...tiles].sort((a, b) => (a.code - b.code) || ((a.red ? 1 : 0) - (b.red ? 1 : 0)) || (a.uid - b.uid));
+  }
+
+  /* =========================================================
+     2. WEB AUDIO SOUND ENGINE
+     ========================================================= */
+  class Mahjong4PAudio {
+    constructor() {
+      this.ctx = null;
+      this.enabled = true;
+    }
+
+    unlock() {
+      try {
+        if (!this.ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) this.ctx = new AC();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      } catch (_e) {
+        // Ignore
+      }
+    }
+
+    toggle() {
+      this.enabled = !this.enabled;
+      return this.enabled;
+    }
+
+    play(freq, dur = 0.1, type = 'triangle', vol = 0.04, delay = 0) {
+      if (!this.enabled || !freq) return;
+      this.unlock();
+      if (!this.ctx) return;
+      try {
+        const t = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + dur + 0.02);
+      } catch (_e) {
+        // Ignore
+      }
+    }
+
+    cursor() { this.play(740, 0.05, 'triangle', 0.03, 0); }
+    clack() {
+      this.play(430, 0.07, 'square', 0.03, 0);
+      this.play(220, 0.08, 'triangle', 0.032, 0.02);
+    }
+    call() {
+      this.play(659.25, 0.09, 'triangle', 0.042, 0);
+      this.play(987.77, 0.13, 'triangle', 0.042, 0.055);
+    }
+    riichi() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => this.play(f, 0.15, 'sawtooth', 0.035, i * 0.045));
+    }
+    undressSound(isFullStrip = false) {
+      // Fabric rustle + descending dramatic chord
+      this.play(587.33, 0.11, 'sawtooth', 0.04, 0);
+      this.play(440, 0.14, 'triangle', 0.045, 0.07);
+      this.play(329.63, isFullStrip ? 0.35 : 0.18, 'sine', 0.05, 0.14);
+      if (isFullStrip) {
+        [293.66, 261.63, 220, 146.83].forEach((f, idx) => this.play(f, 0.28, 'sawtooth', 0.05, 0.22 + idx * 0.09));
+      }
+    }
+    dressSound() {
+      // Warm ascending chimes when putting garment back on
+      [440, 554.37, 659.25, 880].forEach((f, idx) => this.play(f, 0.16, 'triangle', 0.042, idx * 0.065));
+    }
+    win() {
+      [523.25, 659.25, 783.99, 1046.5, 1318.51].forEach((f, i) => this.play(f, 0.22, 'triangle', 0.048, i * 0.07));
+    }
+  }
+
+  const sfx = new Mahjong4PAudio();
+
+  /* =========================================================
+     3. STRICT RIICHI MAHJONG HAND, TENPAI, RIICHI & YAKU ENGINE
+     ========================================================= */
+  function canDecomposeMeldsAndPairs(codes, meldGroupsNeeded, pairsNeeded) {
+    if (codes.length === 0) return meldGroupsNeeded === 0 && pairsNeeded === 0;
+    const s = [...codes].sort((a, b) => a - b);
+    const first = s[0];
+
+    // Pair
+    if (pairsNeeded > 0 && s.filter(x => x === first).length >= 2) {
+      const rem = [...s];
+      rem.splice(rem.indexOf(first), 1);
+      rem.splice(rem.indexOf(first), 1);
+      if (canDecomposeMeldsAndPairs(rem, meldGroupsNeeded, pairsNeeded - 1)) return true;
+    }
+
+    // Triplet (3 of a kind)
+    if (meldGroupsNeeded > 0 && s.filter(x => x === first).length >= 3) {
+      const rem = [...s];
+      for (let k = 0; k < 3; k++) rem.splice(rem.indexOf(first), 1);
+      if (canDecomposeMeldsAndPairs(rem, meldGroupsNeeded - 1, pairsNeeded)) return true;
+    }
+
+    // Sequence (3 consecutive suited tiles)
+    if (meldGroupsNeeded > 0 && first < 30 && (first % 10) <= 7) {
+      const i2 = s.indexOf(first + 1);
+      const i3 = s.indexOf(first + 2);
+      if (i2 !== -1 && i3 !== -1) {
+        const rem = [...s];
+        rem.splice(i3, 1);
+        rem.splice(i2, 1);
+        rem.splice(0, 1);
+        if (canDecomposeMeldsAndPairs(rem, meldGroupsNeeded - 1, pairsNeeded)) return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Evaluates a 14-tile complete set (concealedTiles + melds)
+  // meld item: { type: 'pon'|'chi'|'ankan'|'daiminkan'|'shouminkan', tiles: Tile[], concealed: boolean }
+  function evaluate14Tiles(concealedTiles, melds, opts = {}) {
+    const {
+      isTsumo = false,
+      isRiichi = false,
+      doraIndicators = [1],
+      roundWind = 31,
+      seatWind = 31
+    } = opts;
+
+    const totalCount = concealedTiles.length + melds.reduce((acc, m) => acc + (m.tiles.length >= 4 ? 3 : m.tiles.length), 0);
+    if (totalCount !== 14) return null;
+
+    const concealedCodes = concealedTiles.map(t => t.code);
+    const isMenzen = melds.every(m => m.concealed);
+    const yaku = [];
+    let yakuman = 0;
+
+    // 1. Kokushi Musou (13 orphans)
+    if (isMenzen && concealedCodes.length === 14) {
+      const freq = {};
+      concealedCodes.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
+      if ([...KOKUSHI_CODES].every(k => freq[k] >= 1) && concealedCodes.every(c => KOKUSHI_CODES.has(c))) {
+        yakuman = 1;
+        yaku.push({ name: '国士無双', han: 13 });
+      }
+    }
+
+    // 2. Chiitoitsu (7 pairs)
+    let isChiitoi = false;
+    if (yakuman === 0 && isMenzen && concealedCodes.length === 14) {
+      const freq = {};
+      concealedCodes.forEach(c => { freq[c] = (freq[c] || 0) + 1; });
+      const vals = Object.values(freq);
+      if (vals.length === 7 && vals.every(v => v === 2)) {
+        isChiitoi = true;
+        yaku.push({ name: '七対子', han: 2 });
+      }
+    }
+
+    // 3. Standard 4 melds + 1 pair
+    const neededMelds = Math.max(0, 4 - melds.length);
+    const isStandard = yakuman === 0 && !isChiitoi && canDecomposeMeldsAndPairs(concealedCodes, neededMelds, 1);
+
+    if (yakuman === 0 && !isChiitoi && !isStandard) return null;
+
+    const allTiles = [...concealedTiles];
+    melds.forEach(m => allTiles.push(...m.tiles));
+    const allCodes = allTiles.map(t => t.code);
+
+    if (yakuman === 0) {
+      if (isRiichi && isMenzen) yaku.push({ name: '立直（リーチ）', han: 1 });
+      if (isTsumo && isMenzen) yaku.push({ name: '門前清自摸和', han: 1 });
+      if (allCodes.every(isSimpleCode)) yaku.push({ name: '断么九（タンヤオ）', han: 1 });
+
+      // Yakuhai: White, Green, Red, Round wind, Seat wind
+      const honorDefs = [
+        { code: 35, name: '役牌・白' },
+        { code: 36, name: '役牌・發' },
+        { code: 37, name: '役牌・中' },
+        { code: roundWind, name: `場風（${WIND_CHARS[roundWind] || '東'}）` },
+        { code: seatWind, name: `自風（${WIND_CHARS[seatWind] || '南'}）` }
+      ];
+      honorDefs.forEach(hd => {
+        const cnt = allCodes.filter(c => c === hd.code).length;
+        if (cnt >= 3) yaku.push({ name: hd.name, han: 1 });
+      });
+
+      // Honitsu / Chinitsu
+      const suits = new Set(allCodes.map(c => (c >= 31 ? 'Z' : (c < 10 ? 'M' : (c < 20 ? 'P' : 'S')))));
+      const hasHonor = suits.has('Z');
+      const numSuits = [...suits].filter(s => s !== 'Z');
+      if (numSuits.length === 1 && hasHonor) {
+        yaku.push({ name: '混一色（ホンイツ）', han: isMenzen ? 3 : 2 });
+      } else if (numSuits.length === 1 && !hasHonor) {
+        yaku.push({ name: '清一色（チンイツ）', han: isMenzen ? 6 : 5 });
+      }
+
+      // Toitoi (4 triplets)
+      if (isStandard && melds.every(m => m.type === 'pon' || m.type === 'ankan' || m.type === 'daiminkan' || m.type === 'shouminkan')) {
+        const groups = {};
+        concealedCodes.forEach(c => { groups[c] = (groups[c] || 0) + 1; });
+        const triCount = Object.values(groups).filter(v => v >= 3).length + melds.length;
+        if (triCount >= 4) yaku.push({ name: '対々和', han: 2 });
+      }
+    }
+
+    // Must have at least 1 yaku
+    if (yakuman === 0 && yaku.length === 0) return null;
+
+    // Dora + Red Dora
+    let doraHan = allTiles.filter(t => t.red).length;
+    doraIndicators.forEach(ind => {
+      const target = nextDoraCode(ind);
+      doraHan += allCodes.filter(c => c === target).length;
+    });
+    if (yakuman === 0 && doraHan > 0) {
+      yaku.push({ name: 'ドラ', han: doraHan });
+    }
+
+    const totalHan = yakuman > 0 ? 13 * yakuman : yaku.reduce((s, item) => s + item.han, 0);
+
+    let base = 500;
+    if (yakuman > 0) base = 8000 * yakuman;
+    else if (totalHan >= 13) base = 8000;
+    else if (totalHan >= 8) base = 6000;
+    else if (totalHan >= 6) base = 4000;
+    else if (totalHan >= 5) base = 3000;
+    else if (totalHan === 4) base = 2000;
+    else if (totalHan === 3) base = 1200;
+    else if (totalHan === 2) base = 800;
+
+    return {
+      yaku,
+      totalHan,
+      basePoints: base,
+      isYakuman: yakuman > 0
+    };
+  }
+
+  // Checks whether a 13-tile concealed hand + melds is tenpai (at least 1 tile completes 14 tiles)
+  function getTenpaiWaits(concealed13, melds, opts = {}) {
+    const waits = [];
+    for (const code of ALL_34_CODES) {
+      const testTiles = [...concealed13, { uid: -1, code, red: false }];
+      if (evaluate14Tiles(testTiles, melds, { ...opts, isTsumo: false, isRiichi: false })) {
+        waits.push(code);
+      }
+    }
+    return waits;
+  }
+
+  // Strict Riichi Eligibility Check for a specific discard index `discardIdx` in a 14-tile player hand
+  function canDeclareRiichiWithDiscard(player, discardIdx, wallRemaining, roundWind) {
+    if (player.riichi) return false;
+    if (player.points < 1000) return false;
+    if (wallRemaining < 4) return false;
+    const isMenzen = player.melds.every(m => m.concealed);
+    if (!isMenzen) return false;
+    if (player.hand.length !== 14) return false;
+    if (discardIdx < 0 || discardIdx >= player.hand.length) return false;
+
+    const remaining13 = player.hand.filter((_, i) => i !== discardIdx);
+    const waits = getTenpaiWaits(remaining13, player.melds, {
+      doraIndicators: state.doraIndicators,
+      roundWind,
+      seatWind: player.seatWind
+    });
+    return waits.length > 0;
+  }
+
+  // Returns list of discard indices in player's 14-tile hand that legally allow Riichi
+  function getLegalRiichiDiscardIndices(player, wallRemaining, roundWind) {
+    if (player.hand.length !== 14) return [];
+    const indices = [];
+    for (let i = 0; i < player.hand.length; i++) {
+      if (canDeclareRiichiWithDiscard(player, i, wallRemaining, roundWind)) {
+        indices.push(i);
+      }
+    }
+    return indices;
+  }
+
+  function isPlayerFuriten(player, roundWind) {
+    const base13 = player.hand.length % 3 === 2 ? player.hand.slice(0, -1) : player.hand;
+    const waits = getTenpaiWaits(base13, player.melds, {
+      doraIndicators: state.doraIndicators,
+      roundWind,
+      seatWind: player.seatWind
+    });
+    if (waits.length === 0) return false;
+    const discardSet = new Set(player.river.map(t => t.code));
+    return waits.some(w => discardSet.has(w));
+  }
+
+  /* =========================================================
+     4. 4-PLAYER MAHJONG STATE & TENBOU DRESS/UNDRESS RULE
+     ========================================================= */
+  let toastTimer = null;
+  function showToast(msg, ms = 2500) {
+    const el = document.getElementById('toast-banner');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  // Seat indices: 0 = Player (Bottom / 南家), 1 = Right (東家), 2 = Top (北家), 3 = Left (西家)
+  const state = {
+    roundIndex: 0, // 0=東1局, 1=東2局, 2=東3局, 3=東4局
+    honba: 0,
+    potRiichiSticks: 0,
+    wall: [],
+    rinshanWall: [],
+    doraIndicators: [1],
+    players: [],
+    activeTurn: 0,
+    phase: 'player_discard', // 'player_discard' | 'claim_window' | 'ai_turn' | 'ended'
+    pendingClaim: null,
+    selectedIdx: 0,
+    riichiArmed: false,
+    turnMessage: '',
+    lastResult: null,
+    matchEndedByFullStrip: false,
+    fullStripLoserSeat: null,
+    dressQueue: [],
+    dressIndex: 0,
+    dressAnimElapsedMs: 0,
+    afterDressAction: null
+  };
+
+  function getRoundWind() {
+    return 31;
+  }
+
+  function getRoundTitle() {
+    const names = ['東1局', '東2局', '東3局', '東4局'];
+    const rn = names[state.roundIndex % names.length];
+    return `${rn} ・ ${state.honba}本場`;
+  }
+
+  function init4PlayerRound(fullReset = false) {
+    if (fullReset) {
+      state.roundIndex = 0;
+      state.honba = 0;
+      state.potRiichiSticks = 0;
+      state.matchEndedByFullStrip = false;
+      state.fullStripLoserSeat = null;
+    }
+
+    const deck = build136Deck();
+    state.rinshanWall = deck.splice(0, 4);
+    const firstDora = deck.pop();
+    state.doraIndicators = [firstDora ? firstDora.code : 1];
+    state.wall = deck;
+
+    const prevPoints = fullReset ? [25000, 25000, 25000, 25000] : state.players.map(p => p.points);
+    const prevOutfit = fullReset ? [0, 0, 0, 0] : state.players.map(p => p.outfitStage);
+
+    state.players = SEAT_META.map((meta, idx) => ({
+      seat: idx,
+      name: meta.name,
+      seatWind: meta.wind,
+      isHuman: meta.isHuman,
+      points: prevPoints[idx] ?? 25000,
+      outfitStage: prevOutfit[idx] ?? 0,
+      hand: sortTiles(deck.splice(0, 13)),
+      melds: [],
+      river: [],
+      riichi: false,
+      lastReaction: '対局開始！'
+    }));
+
+    state.activeTurn = 1;
+    state.phase = 'ai_turn';
+    state.pendingClaim = null;
+    state.riichiArmed = false;
+    state.selectedIdx = 0;
+    state.turnMessage = '東家（姫宮ミコト）の配牌・第一打…';
+    updateAllUi();
+    setTimeout(stepAiTurn, 420);
+  }
+
+  /* =========================================================
+     5. KAN (ANKAN, DAIMINKAN, SHOUMINKAN), PON, CHI & RIICHI
+     ========================================================= */
+  function drawFromWall(player, isRinshan = false) {
+    if (isRinshan && state.rinshanWall.length > 0) {
+      const t = state.rinshanWall.pop();
+      player.hand.push(t);
+      const nextInd = state.wall.pop();
+      if (nextInd) state.doraIndicators.push(nextInd.code);
+      return t;
+    }
+    if (state.wall.length === 0) return null;
+    const t = state.wall.pop();
+    player.hand.push(t);
+    return t;
+  }
+
+  function findSelfKanOption(player) {
+    const byCode = {};
+    player.hand.forEach(t => {
+      byCode[t.code] = byCode[t.code] || [];
+      byCode[t.code].push(t);
+    });
+    for (const [cStr, arr] of Object.entries(byCode)) {
+      if (arr.length === 4) {
+        return { kind: 'ankan', code: parseInt(cStr, 10), tiles: arr.slice(0, 4) };
+      }
+    }
+
+    for (const m of player.melds) {
+      if (m.type === 'pon' && m.tiles.length === 3) {
+        const code = m.tiles[0].code;
+        const match = player.hand.find(t => t.code === code);
+        if (match) {
+          return { kind: 'shouminkan', code, tile: match, meldRef: m };
+        }
+      }
+    }
+    return null;
+  }
+
+  function executeSelfKan(player) {
+    const opt = findSelfKanOption(player);
+    if (!opt) return false;
+    if (state.wall.length === 0 || state.rinshanWall.length === 0) {
+      showToast('嶺上牌・王牌が不足しているためカンできません。');
+      return false;
+    }
+
+    if (opt.kind === 'ankan') {
+      const uids = new Set(opt.tiles.map(t => t.uid));
+      player.hand = player.hand.filter(t => !uids.has(t.uid));
+      player.melds.push({ type: 'ankan', tiles: opt.tiles, concealed: true });
+      sfx.call();
+      showToast(`${player.name}：暗槓（カン）！ 嶺上牌をツモ！`);
+    } else {
+      player.hand = player.hand.filter(t => t.uid !== opt.tile.uid);
+      opt.meldRef.type = 'shouminkan';
+      opt.meldRef.tiles.push(opt.tile);
+      sfx.call();
+      showToast(`${player.name}：加槓（カン）！ 嶺上牌をツモ！`);
+    }
+
+    drawFromWall(player, true);
+    state.selectedIdx = player.hand.length - 1;
+    state.phase = 'player_discard';
+    updateAllUi();
+    return true;
+  }
+
+  function executeDaiminkan(player, claimTile) {
+    const matches = player.hand.filter(t => t.code === claimTile.code);
+    if (matches.length < 3 || state.rinshanWall.length === 0) return false;
+    const uids = new Set(matches.slice(0, 3).map(t => t.uid));
+    player.hand = player.hand.filter(t => !uids.has(t.uid));
+    player.melds.push({
+      type: 'daiminkan',
+      tiles: [...matches.slice(0, 3), claimTile],
+      concealed: false
+    });
+    state.pendingClaim = null;
+    state.activeTurn = player.seat;
+    sfx.call();
+    drawFromWall(player, true);
+    state.selectedIdx = player.hand.length - 1;
+    state.phase = 'player_discard';
+    showToast(`${player.name}：明槓（カン）！ 嶺上牌をツモ！`);
+    updateAllUi();
+    return true;
+  }
+
+  function executePon(player, claimTile) {
+    const matches = player.hand.filter(t => t.code === claimTile.code);
+    if (matches.length < 2) return false;
+    const uids = new Set(matches.slice(0, 2).map(t => t.uid));
+    player.hand = player.hand.filter(t => !uids.has(t.uid));
+    player.melds.push({
+      type: 'pon',
+      tiles: [...matches.slice(0, 2), claimTile],
+      concealed: false
+    });
+    state.pendingClaim = null;
+    state.activeTurn = player.seat;
+    state.phase = 'player_discard';
+    state.selectedIdx = Math.max(0, player.hand.length - 1);
+    sfx.call();
+    showToast(`${player.name}：ポン（${tileLabel(claimTile.code)}）！ 打牌を選んでください。`);
+    updateAllUi();
+    return true;
+  }
+
+  function findChiCandidates(player, claimTile) {
+    if (claimTile.code >= 31) return [];
+    const c = claimTile.code;
+    const n = c % 10;
+    const res = [];
+
+    if (n >= 3) {
+      const t1 = player.hand.find(t => t.code === c - 2);
+      const t2 = player.hand.find(t => t.code === c - 1);
+      if (t1 && t2) res.push([t1, t2, claimTile]);
+    }
+    if (n >= 2 && n <= 8) {
+      const t1 = player.hand.find(t => t.code === c - 1);
+      const t2 = player.hand.find(t => t.code === c + 1);
+      if (t1 && t2) res.push([t1, claimTile, t2]);
+    }
+    if (n <= 7) {
+      const t1 = player.hand.find(t => t.code === c + 1);
+      const t2 = player.hand.find(t => t.code === c + 2);
+      if (t1 && t2) res.push([claimTile, t1, t2]);
+    }
+    return res;
+  }
+
+  function executeChi(player, claimTile) {
+    const cands = findChiCandidates(player, claimTile);
+    if (cands.length === 0) return false;
+    const chosen = cands[0];
+    const usedIds = new Set(chosen.filter(t => t.uid !== claimTile.uid).map(t => t.uid));
+    player.hand = player.hand.filter(t => !usedIds.has(t.uid));
+    player.melds.push({
+      type: 'chi',
+      tiles: chosen,
+      concealed: false
+    });
+    state.pendingClaim = null;
+    state.activeTurn = player.seat;
+    state.phase = 'player_discard';
+    state.selectedIdx = Math.max(0, player.hand.length - 1);
+    sfx.call();
+    showToast(`${player.name}：チー！ 打牌を選んでください。`);
+    updateAllUi();
+    return true;
+  }
+
+  /* =========================================================
+     6. TENBOU PAYMENT -> UNDRESS (+1) / DRESS (-1) & FULL STRIP END
+     ========================================================= */
+  function applyTenbouDressRule(winnerSeat, loserSeatOrNull, totalPoints) {
+    const winner = state.players[winnerSeat];
+    const potBonus = state.potRiichiSticks * 1000;
+    state.potRiichiSticks = 0;
+    const totalGain = totalPoints + potBonus;
+
+    const dressChanges = [];
+    const sceneEvents = [];
+    let fullStripSeat = null;
+
+    if (loserSeatOrNull !== null) {
+      const loser = state.players[loserSeatOrNull];
+      const pay = Math.min(loser.points, totalGain);
+      loser.points -= pay;
+      winner.points += pay;
+
+      if (pay > 0 && loser.outfitStage < MAX_OUTFIT_STAGE) {
+        const removedItem = SEAT_META[loser.seat].garments[loser.outfitStage];
+        const prevStg = loser.outfitStage;
+        loser.outfitStage = Math.min(MAX_OUTFIT_STAGE, loser.outfitStage + 1);
+        const isFull = loser.outfitStage >= MAX_OUTFIT_STAGE;
+        dressChanges.push(`${loser.name}：-${pay.toLocaleString()}点 → 【${removedItem}】を脱いだ！（STAGE ${prevStg}→${loser.outfitStage}${isFull ? '・全部脱いだ！' : ''}）`);
+        sceneEvents.push({
+          seat: loser.seat,
+          mode: 'undress',
+          garmentName: removedItem,
+          fromStage: prevStg,
+          toStage: loser.outfitStage,
+          pointsDelta: -pay,
+          isFullStrip: isFull
+        });
+        if (isFull && fullStripSeat === null) fullStripSeat = loser.seat;
+      }
+
+      if (pay > 0 && winner.outfitStage > 0) {
+        const prevStg = winner.outfitStage;
+        const dressedItem = SEAT_META[winner.seat].garments[prevStg - 1];
+        winner.outfitStage = Math.max(0, winner.outfitStage - 1);
+        dressChanges.push(`${winner.name}：+${pay.toLocaleString()}点 → 【${dressedItem}】を着た！（STAGE ${prevStg}→${winner.outfitStage}）`);
+        sceneEvents.push({
+          seat: winner.seat,
+          mode: 'dress',
+          garmentName: dressedItem,
+          fromStage: prevStg,
+          toStage: winner.outfitStage,
+          pointsDelta: +pay,
+          isFullStrip: false
+        });
+      }
+    } else {
+      let collected = 0;
+      state.players.forEach((p, idx) => {
+        if (idx === winnerSeat) return;
+        const share = Math.min(p.points, Math.ceil(totalGain / 300) * 100);
+        p.points -= share;
+        collected += share;
+        if (share > 0 && p.outfitStage < MAX_OUTFIT_STAGE) {
+          const removedItem = SEAT_META[p.seat].garments[p.outfitStage];
+          const prevStg = p.outfitStage;
+          p.outfitStage = Math.min(MAX_OUTFIT_STAGE, p.outfitStage + 1);
+          const isFull = p.outfitStage >= MAX_OUTFIT_STAGE;
+          dressChanges.push(`${p.name}：-${share.toLocaleString()}点 → 【${removedItem}】を脱いだ！（STAGE ${prevStg}→${p.outfitStage}${isFull ? '・全部脱いだ！' : ''}）`);
+          sceneEvents.push({
+            seat: p.seat,
+            mode: 'undress',
+            garmentName: removedItem,
+            fromStage: prevStg,
+            toStage: p.outfitStage,
+            pointsDelta: -share,
+            isFullStrip: isFull
+          });
+          if (isFull && fullStripSeat === null) fullStripSeat = p.seat;
+        }
+      });
+      winner.points += collected;
+      if (collected > 0 && winner.outfitStage > 0) {
+        const prevStg = winner.outfitStage;
+        const dressedItem = SEAT_META[winner.seat].garments[prevStg - 1];
+        winner.outfitStage = Math.max(0, winner.outfitStage - 1);
+        dressChanges.unshift(`${winner.name}：+${collected.toLocaleString()}点 → 【${dressedItem}】を着た！（STAGE ${prevStg}→${winner.outfitStage}）`);
+        sceneEvents.push({
+          seat: winner.seat,
+          mode: 'dress',
+          garmentName: dressedItem,
+          fromStage: prevStg,
+          toStage: winner.outfitStage,
+          pointsDelta: +collected,
+          isFullStrip: false
+        });
+      }
+    }
+
+    if (dressChanges.length === 0) {
+      dressChanges.push('点棒移動なしにつき衣装変動はありません。');
+    }
+
+    return { dressChanges, sceneEvents, fullStripSeat };
+  }
+
+  function finishRoundWithAgari(winnerSeat, loserSeatOrNull, winEval, methodName) {
+    state.phase = 'ended';
+    sfx.win();
+    const outcome = applyTenbouDressRule(winnerSeat, loserSeatOrNull, winEval.basePoints * (loserSeatOrNull !== null ? 4 : 2));
+    state.matchEndedByFullStrip = outcome.fullStripSeat !== null;
+    state.fullStripLoserSeat = outcome.fullStripSeat;
+
+    if (outcome.fullStripSeat !== null) {
+      const loserName = state.players[outcome.fullStripSeat].name;
+      outcome.dressChanges.push(`★ ${loserName} が全部脱いだため【ビリ確定】＆【全体勝負終了】！ ★`);
+    }
+
+    state.lastResult = {
+      type: 'agari',
+      winnerName: state.players[winnerSeat].name,
+      methodName,
+      yaku: winEval.yaku,
+      totalHan: winEval.totalHan,
+      dressChanges: outcome.dressChanges,
+      isMatchOver: state.matchEndedByFullStrip,
+      fullStripLoserSeat: outcome.fullStripLoserSeat
+    };
+
+    updateAllUi();
+
+    if (outcome.sceneEvents.length > 0) {
+      launchDressScene(outcome.sceneEvents, 'result_modal');
+    } else {
+      openResultModal();
+    }
+  }
+
+  function finishRoundRyuukyoku() {
+    state.phase = 'ended';
+    const tenpaiFlags = state.players.map(p => {
+      const base13 = p.hand.length % 3 === 2 ? p.hand.slice(0, -1) : p.hand;
+      return getTenpaiWaits(base13, p.melds, {
+        doraIndicators: state.doraIndicators,
+        roundWind: getRoundWind(),
+        seatWind: p.seatWind
+      }).length > 0;
+    });
+    const tenpaiCount = tenpaiFlags.filter(Boolean).length;
+    const notes = [];
+    const sceneEvents = [];
+    let fullStripSeat = null;
+
+    if (tenpaiCount > 0 && tenpaiCount < 4) {
+      const gainEach = Math.round(3000 / tenpaiCount);
+      const lossEach = Math.round(3000 / (4 - tenpaiCount));
+      state.players.forEach((p, i) => {
+        if (tenpaiFlags[i]) {
+          p.points += gainEach;
+          if (p.outfitStage > 0) {
+            const prevStg = p.outfitStage;
+            const dressedItem = SEAT_META[p.seat].garments[prevStg - 1];
+            p.outfitStage = Math.max(0, p.outfitStage - 1);
+            notes.push(`${p.name}：テンパイ +${gainEach}点 → 【${dressedItem}】を着た（STAGE ${prevStg}→${p.outfitStage}）`);
+            sceneEvents.push({
+              seat: p.seat,
+              mode: 'dress',
+              garmentName: dressedItem,
+              fromStage: prevStg,
+              toStage: p.outfitStage,
+              pointsDelta: +gainEach,
+              isFullStrip: false
+            });
+          } else {
+            notes.push(`${p.name}：テンパイ +${gainEach}点`);
+          }
+        } else {
+          p.points = Math.max(0, p.points - lossEach);
+          if (p.outfitStage < MAX_OUTFIT_STAGE) {
+            const removedItem = SEAT_META[p.seat].garments[p.outfitStage];
+            const prevStg = p.outfitStage;
+            p.outfitStage = Math.min(MAX_OUTFIT_STAGE, p.outfitStage + 1);
+            const isFull = p.outfitStage >= MAX_OUTFIT_STAGE;
+            notes.push(`${p.name}：ノーテン -${lossEach}点 → 【${removedItem}】を脱いだ（STAGE ${prevStg}→${p.outfitStage}${isFull ? '・全部脱いだ！' : ''}）`);
+            sceneEvents.push({
+              seat: p.seat,
+              mode: 'undress',
+              garmentName: removedItem,
+              fromStage: prevStg,
+              toStage: p.outfitStage,
+              pointsDelta: -lossEach,
+              isFullStrip: isFull
+            });
+            if (isFull && fullStripSeat === null) fullStripSeat = p.seat;
+          } else {
+            notes.push(`${p.name}：ノーテン -${lossEach}点`);
+          }
+        }
+      });
+    } else {
+      notes.push('全員テンパイまたは全員ノーテンにつき点棒・衣装変動なし。');
+    }
+
+    state.matchEndedByFullStrip = fullStripSeat !== null;
+    state.fullStripLoserSeat = fullStripSeat;
+    if (fullStripSeat !== null) {
+      notes.push(`★ ${state.players[fullStripSeat].name} が全部脱いだため【ビリ確定】＆【全体勝負終了】！ ★`);
+    }
+
+    state.honba += 1;
+    state.lastResult = {
+      type: 'draw',
+      winnerName: '流局（荒牌平局）',
+      methodName: `テンパイ ${tenpaiCount}/4人`,
+      yaku: [],
+      totalHan: 0,
+      dressChanges: notes,
+      isMatchOver: state.matchEndedByFullStrip,
+      fullStripLoserSeat: fullStripSeat
+    };
+    updateAllUi();
+
+    if (sceneEvents.length > 0) {
+      launchDressScene(sceneEvents, 'result_modal');
+    } else {
+      openResultModal();
+    }
+  }
+
+  function handlePassClaimWindow() {
+    if (state.phase !== 'claim_window' || !state.pendingClaim) return;
+    const fromSeat = state.pendingClaim.fromSeat;
+    state.pendingClaim = null;
+    state.activeTurn = (fromSeat + 1) % 4;
+    state.phase = 'ai_turn';
+    updateAllUi();
+    setTimeout(stepAiTurn, 280);
+  }
+
+  function checkRonOrCallAfterDiscard(discarderSeat, tile) {
+    if (discarderSeat !== 0) {
+      const me = state.players[0];
+      const canRon = !isPlayerFuriten(me, getRoundWind()) &&
+        !!evaluate14Tiles([...me.hand, tile], me.melds, {
+          isTsumo: false,
+          isRiichi: me.riichi,
+          doraIndicators: state.doraIndicators,
+          roundWind: getRoundWind(),
+          seatWind: me.seatWind
+        });
+      const canPon = !me.riichi && me.hand.filter(t => t.code === tile.code).length >= 2;
+      const canChi = !me.riichi && discarderSeat === 3 && findChiCandidates(me, tile).length > 0;
+      const canDaiminkan = !me.riichi && me.hand.filter(t => t.code === tile.code).length >= 3 && state.rinshanWall.length > 0;
+
+      if (canRon || canPon || canChi || canDaiminkan) {
+        state.pendingClaim = { fromSeat: discarderSeat, tile };
+        state.phase = 'claim_window';
+        state.turnMessage = `${state.players[discarderSeat].name}が「${tileLabel(tile.code)}」を打牌！ 鳴き/ロンまたはスキップを選択`;
+        updateAllUi();
+        return;
+      }
+    }
+
+    state.activeTurn = (discarderSeat + 1) % 4;
+    state.phase = 'ai_turn';
+    updateAllUi();
+    setTimeout(stepAiTurn, 320);
+  }
+
+  function stepAiTurn() {
+    if (state.phase !== 'ai_turn' || isAnyOverlayOpen()) return;
+    const seat = state.activeTurn;
+    const p = state.players[seat];
+    if (!p || p.isHuman) {
+      beginHumanDrawTurn();
+      return;
+    }
+
+    if (state.wall.length === 0) {
+      finishRoundRyuukyoku();
+      return;
+    }
+
+    const drawn = drawFromWall(p, false);
+    if (!drawn) {
+      finishRoundRyuukyoku();
+      return;
+    }
+
+    const tsumoEv = evaluate14Tiles(p.hand, p.melds, {
+      isTsumo: true,
+      isRiichi: p.riichi,
+      doraIndicators: state.doraIndicators,
+      roundWind: getRoundWind(),
+      seatWind: p.seatWind
+    });
+    if (tsumoEv) {
+      finishRoundWithAgari(seat, null, tsumoEv, 'ツモ');
+      return;
+    }
+
+    p.hand.sort((a, b) => {
+      const sa = a.code >= 31 ? 100 : (a.code % 10 === 1 || a.code % 10 === 9 ? 50 : 10);
+      const sb = b.code >= 31 ? 100 : (b.code % 10 === 1 || b.code % 10 === 9 ? 50 : 10);
+      return sb - sa;
+    });
+    const outTile = p.hand.pop();
+    p.river.push(outTile);
+    sfx.clack();
+
+    checkRonOrCallAfterDiscard(seat, outTile);
+  }
+
+  function beginHumanDrawTurn() {
+    state.activeTurn = 0;
+    const me = state.players[0];
+    if (state.wall.length === 0) {
+      finishRoundRyuukyoku();
+      return;
+    }
+
+    const drawn = drawFromWall(me, false);
+    if (!drawn) {
+      finishRoundRyuukyoku();
+      return;
+    }
+
+    state.selectedIdx = me.hand.length - 1;
+    state.riichiArmed = false;
+    state.phase = 'player_discard';
+    state.turnMessage = `あなたの番（ツモ：${tileLabel(drawn.code)}）`;
+    updateAllUi();
+  }
+
+  /* =========================================================
+     7. PLAYER INTERACTION HANDLERS (DISCARD, RIICHI, CALLS, WIN)
+     ========================================================= */
+  function moveHandCursor(delta) {
+    const me = state.players[0];
+    if (!me || me.hand.length === 0) return;
+    state.selectedIdx = (state.selectedIdx + delta + me.hand.length) % me.hand.length;
+    sfx.cursor();
+    renderHandCanvas();
+    updateCallButtons();
+  }
+
+  function handlePlayerDiscard() {
+    if (state.phase !== 'player_discard' || isAnyOverlayOpen()) return;
+    const me = state.players[0];
+    if (!me || me.hand.length === 0) return;
+    if (state.selectedIdx < 0 || state.selectedIdx >= me.hand.length) {
+      state.selectedIdx = me.hand.length - 1;
+    }
+
+    if (state.riichiArmed) {
+      if (!canDeclareRiichiWithDiscard(me, state.selectedIdx, state.wall.length, getRoundWind())) {
+        showToast('選択中の牌を切るとテンパイにならないためリーチできません！ 別の牌を選ぶかリーチ解除してください。');
+        return;
+      }
+      me.points -= 1000;
+      state.potRiichiSticks += 1;
+      me.riichi = true;
+      state.riichiArmed = false;
+      sfx.riichi();
+      showToast('★ リーチ宣言成立！（1,000点供託） ★');
+    }
+
+    const discarded = me.hand.splice(state.selectedIdx, 1)[0];
+    me.hand = sortTiles(me.hand);
+    me.river.push(discarded);
+    state.selectedIdx = Math.min(state.selectedIdx, Math.max(0, me.hand.length - 1));
+    sfx.clack();
+
+    checkRonOrCallAfterDiscard(0, discarded);
+  }
+
+  function handleToggleRiichiArm() {
+    if (state.phase !== 'player_discard') {
+      showToast('自分の打牌番にのみリーチ宣言できます。');
+      return;
+    }
+    const me = state.players[0];
+    if (me.riichi) {
+      showToast('すでにリーチ中です。');
+      return;
+    }
+    const legalIndices = getLegalRiichiDiscardIndices(me, state.wall.length, getRoundWind());
+    if (legalIndices.length === 0) {
+      showToast('リーチ条件を満たしていません（門前・1,000点以上・山牌4枚以上・打牌後テンパイが必要）。');
+      return;
+    }
+
+    if (!state.riichiArmed) {
+      state.riichiArmed = true;
+      if (!legalIndices.includes(state.selectedIdx)) {
+        state.selectedIdx = legalIndices[0];
+      }
+      sfx.cursor();
+      showToast('リーチ待機中！ テンパイになる牌を選んで「打牌」を押してください。');
+    } else {
+      state.riichiArmed = false;
+      showToast('リーチ宣言をキャンセルしました。');
+    }
+    renderHandCanvas();
+    updateCallButtons();
+  }
+
+  function handlePlayerTsumo() {
+    if (state.phase !== 'player_discard') return;
+    const me = state.players[0];
+    const ev = evaluate14Tiles(me.hand, me.melds, {
+      isTsumo: true,
+      isRiichi: me.riichi,
+      doraIndicators: state.doraIndicators,
+      roundWind: getRoundWind(),
+      seatWind: me.seatWind
+    });
+    if (!ev) {
+      showToast('まだツモアガリ役（1翻以上）が成立していません！');
+      return;
+    }
+    finishRoundWithAgari(0, null, ev, 'ツモ');
+  }
+
+  function handlePlayerRon() {
+    if (state.phase !== 'claim_window' || !state.pendingClaim) return;
+    const me = state.players[0];
+    const { fromSeat, tile } = state.pendingClaim;
+    if (isPlayerFuriten(me, getRoundWind())) {
+      showToast('フリテン状態のためロンできません！');
+      return;
+    }
+    const ev = evaluate14Tiles([...me.hand, tile], me.melds, {
+      isTsumo: false,
+      isRiichi: me.riichi,
+      doraIndicators: state.doraIndicators,
+      roundWind: getRoundWind(),
+      seatWind: me.seatWind
+    });
+    if (!ev) {
+      showToast('この牌ではロンアガリ役が成立しません。');
+      return;
+    }
+    state.pendingClaim = null;
+    finishRoundWithAgari(0, fromSeat, ev, 'ロン');
+  }
+
+  function handlePlayerPon() {
+    if (state.phase !== 'claim_window' || !state.pendingClaim) return;
+    const me = state.players[0];
+    if (me.riichi) return;
+    if (!executePon(me, state.pendingClaim.tile)) {
+      showToast('ポンできる牌がありません。');
+    }
+  }
+
+  function handlePlayerChi() {
+    if (state.phase !== 'claim_window' || !state.pendingClaim) return;
+    const me = state.players[0];
+    if (me.riichi) return;
+    if (state.pendingClaim.fromSeat !== 3) {
+      showToast('チーは上家（左・西家）からの打牌にのみ可能です。');
+      return;
+    }
+    if (!executeChi(me, state.pendingClaim.tile)) {
+      showToast('チーできる順子がありません。');
+    }
+  }
+
+  function handlePlayerKan() {
+    const me = state.players[0];
+    if (!me || me.riichi) return;
+    if (state.phase === 'player_discard') {
+      if (!executeSelfKan(me)) {
+        showToast('暗槓または加槓できる牌がありません。');
+      }
+    } else if (state.phase === 'claim_window' && state.pendingClaim) {
+      if (!executeDaiminkan(me, state.pendingClaim.tile)) {
+        showToast('明槓できる牌がありません。');
+      }
+    }
+  }
+
+  /* =========================================================
+     8. CANVAS RENDERING: TILES, 4-PLAYER TABLE & DRESS SCENE
+     ========================================================= */
+  function fitCanvas(canvas) {
+    if (!canvas) return { ctx: null, w: 0, h: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(1, Math.round(rect.width));
+    const h = Math.max(1, Math.round(rect.height));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const pw = Math.round(w * dpr);
+    const ph = Math.round(h * dpr);
+    if (canvas.width !== pw || canvas.height !== ph) {
+      canvas.width = pw;
+      canvas.height = ph;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, h };
+  }
+
+  function drawFaceDownTile(ctx, x, y, w, h) {
+    ctx.save();
+    const grad = ctx.createLinearGradient(x, y, x, y + h);
+    grad.addColorStop(0, '#3b82f6');
+    grad.addColorStop(1, '#1d4ed8');
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 3);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMahjongTileFace(ctx, x, y, w, h, code, isRed = false) {
+    ctx.save();
+    const grad = ctx.createLinearGradient(x, y, x, y + h);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.75, '#fffdf7');
+    grad.addColorStop(1, '#e8dcc6');
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = isRed ? '#ef4444' : '#64748b';
+    ctx.lineWidth = isRed ? 1.6 : 1.1;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    let mainGlyph = '';
+    let subGlyph = '';
+    let ink = '#1e293b';
+
+    if (code >= 1 && code <= 9) {
+      mainGlyph = KANJI_DIGITS[code];
+      subGlyph = '萬';
+      ink = isRed ? '#e11d48' : '#b91c1c';
+    } else if (code >= 11 && code <= 19) {
+      mainGlyph = KANJI_DIGITS[code - 10];
+      subGlyph = '筒';
+      ink = isRed ? '#e11d48' : '#1d4ed8';
+    } else if (code >= 21 && code <= 29) {
+      mainGlyph = KANJI_DIGITS[code - 20];
+      subGlyph = '索';
+      ink = isRed ? '#e11d48' : '#15803d';
+    } else {
+      mainGlyph = WIND_CHARS[code] || DRAGON_CHARS[code] || '字';
+      subGlyph = code >= 35 ? '牌' : '風';
+      ink = code === 37 ? '#dc2626' : (code === 36 ? '#15803d' : '#1e293b');
+    }
+
+    ctx.fillStyle = ink;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const fontBig = Math.max(9, Math.min(14, Math.floor(h * 0.42)));
+    const fontSub = Math.max(7, Math.min(10, Math.floor(h * 0.28)));
+    ctx.font = `900 ${fontBig}px sans-serif`;
+    ctx.fillText(mainGlyph, x + w * 0.5, y + h * 0.36);
+    ctx.font = `800 ${fontSub}px sans-serif`;
+    ctx.fillText(subGlyph, x + w * 0.5, y + h * 0.72);
+    ctx.restore();
+  }
+
+  function drawHeroineAvatar(ctx, meta, outfitStage, cx, cy, size, now, animOpts = {}) {
+    ctx.save();
+    const bob = Math.sin(now / 420) * 1.8;
+    const shakeX = animOpts.shake ? Math.sin(now / 38) * 5 : 0;
+    ctx.translate(cx + shakeX, cy + bob);
+    const sc = size / 68;
+    ctx.scale(sc, sc);
+
+    ctx.fillStyle = meta.hair;
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, -8, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    if (outfitStage < 1) {
+      ctx.fillStyle = meta.suitA;
+      ctx.beginPath();
+      ctx.roundRect(-23, 13, 46, 26, 9);
+      ctx.fill();
+      ctx.stroke();
+    }
+    if (outfitStage < 2) {
+      ctx.fillStyle = meta.suitB;
+      ctx.beginPath();
+      ctx.roundRect(-19, 15, 38, 23, 8);
+      ctx.fill();
+      ctx.stroke();
+    }
+    if (outfitStage < 3) {
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(-16, 28);
+      ctx.lineTo(16, 28);
+      ctx.lineTo(22, 41);
+      ctx.lineTo(-22, 41);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+    if (outfitStage < 4) {
+      ctx.fillStyle = '#fbcfe8';
+      ctx.beginPath();
+      ctx.roundRect(-14, 18, 28, 17, 6);
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      ctx.strokeStyle = '#fb7185';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.roundRect(-16, 16, 32, 22, 8);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.fillStyle = '#fff1f2';
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, -7, 16.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    if (outfitStage >= 1) {
+      ctx.fillStyle = `rgba(244, 114, 182, ${Math.min(0.85, 0.25 + outfitStage * 0.16)})`;
+      ctx.beginPath();
+      ctx.ellipse(-9.5, -1.5, 3.8, 2.2, 0, 0, Math.PI * 2);
+      ctx.ellipse(9.5, -1.5, 3.8, 2.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = meta.eye;
+    ctx.beginPath();
+    ctx.arc(-6, -5, 2.6, 0, Math.PI * 2);
+    ctx.arc(6, -5, 2.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#be123c';
+    ctx.lineWidth = 1.6;
+    if (outfitStage >= 4) {
+      ctx.beginPath();
+      ctx.arc(0, 3, 3.2, 0, Math.PI * 2);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 2, 3.6, 0.15 * Math.PI, 0.85 * Math.PI);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function drawDressStageScene(ctx, w, h, now) {
+    ctx.clearRect(0, 0, w, h);
+    const ev = state.dressQueue[state.dressIndex];
+    if (!ev) return;
+
+    const meta = SEAT_META[ev.seat] || SEAT_META[0];
+    const isUndress = ev.mode === 'undress';
+
+    const bgGrad = ctx.createRadialGradient(w * 0.5, h * 0.42, 12, w * 0.5, h * 0.5, Math.max(w, h) * 0.72);
+    bgGrad.addColorStop(0, isUndress ? 'rgba(251, 113, 133, 0.34)' : 'rgba(56, 189, 248, 0.3)');
+    bgGrad.addColorStop(0.6, 'rgba(30, 10, 58, 0.92)');
+    bgGrad.addColorStop(1, '#070311');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.translate(w * 0.5, h * 0.12);
+    const rot = Math.sin(now / 900) * 0.14;
+    ctx.rotate(rot);
+    for (let i = -2; i <= 2; i++) {
+      ctx.fillStyle = isUndress ? 'rgba(253, 164, 175, 0.07)' : 'rgba(125, 211, 252, 0.07)';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(i * 46 - 20, h * 0.85);
+      ctx.lineTo(i * 46 + 20, h * 0.85);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+
+    const progress = Math.min(1, state.dressAnimElapsedMs / 1600);
+    const visualStage = progress >= 0.55 ? ev.toStage : ev.fromStage;
+    drawHeroineAvatar(ctx, meta, visualStage, w * 0.5, h * 0.52, Math.min(w, h) * 0.56, now, { shake: isUndress && progress < 0.65 });
+
+    const flyOffset = isUndress ? progress * 76 : (1 - progress) * 76;
+    const alpha = isUndress ? Math.max(0.15, 1 - progress * 0.75) : Math.min(1, 0.25 + progress * 0.75);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(w * 0.5 + (isUndress ? flyOffset * 0.65 : -flyOffset * 0.65), h * 0.24 - (isUndress ? flyOffset * 0.35 : 0));
+    ctx.rotate(isUndress ? progress * 0.35 : (1 - progress) * -0.25);
+    ctx.fillStyle = isUndress ? 'rgba(190, 24, 93, 0.88)' : 'rgba(3, 105, 161, 0.88)';
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-84, -18, 168, 36, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(isUndress ? `脱衣：${ev.garmentName}` : `着衣：${ev.garmentName}`, 0, 1);
+    ctx.restore();
+
+    for (let i = 0; i < 16; i++) {
+      const ang = (now / 450 + i * 0.42);
+      const rad = 42 + ((i * 19 + Math.floor(now / 60)) % 75);
+      const sx = w * 0.5 + Math.cos(ang) * rad;
+      const sy = h * 0.5 + Math.sin(ang * 1.2) * rad * 0.75;
+      ctx.save();
+      ctx.fillStyle = i % 2 === 0 ? '#fef08a' : (isUndress ? '#fb7185' : '#38bdf8');
+      ctx.beginPath();
+      ctx.arc(sx, sy, 2.2 + (i % 3), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawTableCanvas(ctx, w, h, now) {
+    ctx.clearRect(0, 0, w, h);
+
+    const feltGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.65);
+    feltGrad.addColorStop(0, '#18624a');
+    feltGrad.addColorStop(1, '#0b2d22');
+    ctx.fillStyle = feltGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    if (!state.players || state.players.length < 4) return;
+
+    const pTop = state.players[2];
+    const pLeft = state.players[3];
+    const pRight = state.players[1];
+    const pMe = state.players[0];
+
+    drawHeroineAvatar(ctx, SEAT_META[2], pTop.outfitStage, w * 0.5, 30, 44, now);
+    const topHiddenCount = Math.min(13, pTop.hand.length);
+    const backW = 10;
+    const backH = 15;
+    const topStartX = w * 0.5 - (topHiddenCount * (backW + 1)) * 0.5;
+    for (let i = 0; i < topHiddenCount; i++) {
+      drawFaceDownTile(ctx, topStartX + i * (backW + 1), 52, backW, backH);
+    }
+
+    drawHeroineAvatar(ctx, SEAT_META[3], pLeft.outfitStage, 34, h * 0.45, 42, now);
+    for (let i = 0; i < Math.min(10, pLeft.hand.length); i++) {
+      drawFaceDownTile(ctx, 12, h * 0.54 + i * 7, 13, 8);
+    }
+
+    drawHeroineAvatar(ctx, SEAT_META[1], pRight.outfitStage, w - 34, h * 0.45, 42, now);
+    for (let i = 0; i < Math.min(10, pRight.hand.length); i++) {
+      drawFaceDownTile(ctx, w - 25, h * 0.54 + i * 7, 13, 8);
+    }
+
+    const rTileW = 17;
+    const rTileH = 23;
+
+    pTop.river.forEach((t, idx) => {
+      const col = idx % 8;
+      const row = Math.floor(idx / 8);
+      drawMahjongTileFace(ctx, w * 0.5 - 4 * (rTileW + 1) + col * (rTileW + 1), 74 + row * (rTileH + 1), rTileW, rTileH, t.code, t.red);
+    });
+
+    pMe.river.forEach((t, idx) => {
+      const col = idx % 8;
+      const row = Math.floor(idx / 8);
+      drawMahjongTileFace(ctx, w * 0.5 - 4 * (rTileW + 1) + col * (rTileW + 1), h - 66 - row * (rTileH + 1), rTileW, rTileH, t.code, t.red);
+    });
+
+    pLeft.river.forEach((t, idx) => {
+      const col = idx % 3;
+      const row = Math.floor(idx / 3);
+      drawMahjongTileFace(ctx, 60 + col * (rTileW + 1), h * 0.34 + row * (rTileH + 1), rTileW, rTileH, t.code, t.red);
+    });
+
+    pRight.river.forEach((t, idx) => {
+      const col = idx % 3;
+      const row = Math.floor(idx / 3);
+      drawMahjongTileFace(ctx, w - 60 - 3 * (rTileW + 1) + col * (rTileW + 1), h * 0.34 + row * (rTileH + 1), rTileW, rTileH, t.code, t.red);
+    });
+
+    let meldX = 14;
+    pMe.melds.forEach(m => {
+      m.tiles.forEach(t => {
+        if (m.type === 'ankan') drawFaceDownTile(ctx, meldX, h - 24, 15, 21);
+        else drawMahjongTileFace(ctx, meldX, h - 24, 15, 21, t.code, t.red);
+        meldX += 16;
+      });
+      meldX += 6;
+    });
+  }
+
+  function renderHandCanvas() {
+    const canvas = document.getElementById('hand-canvas');
+    const { ctx, w, h } = fitCanvas(canvas);
+    if (!ctx) return;
+    ctx.clearRect(0, 0, w, h);
+
+    const me = state.players[0];
+    if (!me || me.hand.length === 0) return;
+
+    const count = me.hand.length;
+    const gap = 2;
+    const tileW = Math.min(34, Math.max(18, Math.floor((w - gap * (count + 1)) / count)));
+    const tileH = Math.min(h - 10, 48);
+    const totalW = count * tileW + (count - 1) * gap;
+    const startX = Math.floor((w - totalW) / 2);
+
+    me.hand.forEach((t, idx) => {
+      const isSel = idx === state.selectedIdx;
+      const lift = isSel ? -6 : 0;
+      const x = startX + idx * (tileW + gap);
+      const y = h - tileH - 3 + lift;
+      drawMahjongTileFace(ctx, x, y, tileW, tileH, t.code, t.red);
+      if (isSel) {
+        ctx.save();
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.roundRect(x - 1, y - 1, tileW + 2, tileH + 2, 5);
+        ctx.stroke();
+        ctx.restore();
+      }
+    });
+  }
+
+  function renderDoraCanvas() {
+    const c = document.getElementById('hud-dora-canvas');
+    const { ctx, w, h } = fitCanvas(c);
+    if (!ctx) return;
+    ctx.clearRect(0, 0, w, h);
+    const ind = state.doraIndicators[state.doraIndicators.length - 1] || 1;
+    drawMahjongTileFace(ctx, 1, 1, w - 2, h - 2, nextDoraCode(ind), false);
+  }
+
+  let prevRenderTime = performance.now();
+  function renderLoop(now) {
+    const dt = Math.min(80, now - prevRenderTime);
+    prevRenderTime = now;
+
+    if (document.getElementById('dress-scene-screen').classList.contains('active')) {
+      state.dressAnimElapsedMs += dt;
+      if (state.dressAnimElapsedMs >= 2800) {
+        advanceDressSceneStep();
+      }
+      const dFit = fitCanvas(document.getElementById('dress-stage-canvas'));
+      if (dFit.ctx) drawDressStageScene(dFit.ctx, dFit.w, dFit.h, now);
+    }
+
+    const tFit = fitCanvas(document.getElementById('table-canvas'));
+    if (tFit.ctx) drawTableCanvas(tFit.ctx, tFit.w, tFit.h, now);
+
+    if (document.getElementById('title-screen').classList.contains('active')) {
+      const cFit = fitCanvas(document.getElementById('title-cast-canvas'));
+      if (cFit.ctx) {
+        cFit.ctx.clearRect(0, 0, cFit.w, cFit.h);
+        SEAT_META.forEach((m, i) => {
+          const stg = state.players[i]?.outfitStage || 0;
+          drawHeroineAvatar(cFit.ctx, m, stg, cFit.w * ((i + 0.5) / 4), cFit.h * 0.62, 74, now);
+        });
+      }
+    }
+
+    requestAnimationFrame(renderLoop);
+  }
+
+  /* =========================================================
+     9. HUD, CALL BUTTONS, SAVE / LOAD / DELETE & MODALS
+     ========================================================= */
+  function updateCallButtons() {
+    const me = state.players[0];
+    if (!me) return;
+
+    const isMyDiscard = state.phase === 'player_discard';
+    const isClaim = state.phase === 'claim_window' && !!state.pendingClaim;
+
+    const canTsumo = isMyDiscard && !!evaluate14Tiles(me.hand, me.melds, {
+      isTsumo: true,
+      isRiichi: me.riichi,
+      doraIndicators: state.doraIndicators,
+      roundWind: getRoundWind(),
+      seatWind: me.seatWind
+    });
+
+    const canRon = isClaim && !isPlayerFuriten(me, getRoundWind()) &&
+      !!evaluate14Tiles([...me.hand, state.pendingClaim.tile], me.melds, {
+        isTsumo: false,
+        isRiichi: me.riichi,
+        doraIndicators: state.doraIndicators,
+        roundWind: getRoundWind(),
+        seatWind: me.seatWind
+      });
+
+    const canRiichi = isMyDiscard && getLegalRiichiDiscardIndices(me, state.wall.length, getRoundWind()).length > 0;
+    const canPon = isClaim && !me.riichi && me.hand.filter(t => t.code === state.pendingClaim.tile.code).length >= 2;
+    const canChi = isClaim && !me.riichi && state.pendingClaim.fromSeat === 3 && findChiCandidates(me, state.pendingClaim.tile).length > 0;
+    const canKan = (isMyDiscard && !!findSelfKanOption(me)) ||
+      (isClaim && !me.riichi && me.hand.filter(t => t.code === state.pendingClaim.tile.code).length >= 3 && state.rinshanWall.length > 0);
+
+    document.getElementById('btn-tsumo').classList.toggle('enabled', canTsumo);
+    document.getElementById('btn-ron').classList.toggle('enabled', canRon);
+    document.getElementById('btn-riichi').classList.toggle('enabled', canRiichi);
+    document.getElementById('btn-pon').classList.toggle('enabled', canPon);
+    document.getElementById('btn-chi').classList.toggle('enabled', canChi);
+    document.getElementById('btn-kan').classList.toggle('enabled', canKan);
+    document.getElementById('btn-discard').classList.toggle('enabled', isMyDiscard);
+
+    // Show waits hint if player has 13 concealed tiles
+    const base13 = me.hand.length % 3 === 2 ? me.hand.slice(0, -1) : me.hand;
+    const waits = getTenpaiWaits(base13, me.melds, {
+      doraIndicators: state.doraIndicators,
+      roundWind: getRoundWind(),
+      seatWind: me.seatWind
+    });
+    document.getElementById('hud-waits-msg').textContent =
+      waits.length > 0 ? `待ち: ${waits.map(tileLabel).join('・')}` : '';
+  }
+
+  function updateAllUi() {
+    document.getElementById('hud-round-label').textContent = getRoundTitle();
+    document.getElementById('hud-wall-count').textContent = `山:${state.wall.length}`;
+    document.getElementById('hud-turn-msg').textContent = state.turnMessage;
+
+    const scoresGrid = document.getElementById('scores-4p-grid');
+    scoresGrid.innerHTML = '';
+    const roster = document.getElementById('pc-4p-roster');
+    if (roster) roster.innerHTML = '';
+
+    state.players.forEach((p, idx) => {
+      const chip = document.createElement('div');
+      chip.className = `seat-score-chip${state.activeTurn === idx ? ' active-turn' : ''}${p.riichi ? ' riichi-on' : ''}`;
+      chip.innerHTML = `
+        <div style="color:#fbcfe8;">${p.name.split('（')[0]}${p.riichi ? '🔴' : ''}</div>
+        <div style="color:#fef08a;">${p.points.toLocaleString()}</div>
+        <div style="color:#f9a8d4;font-size:0.9em;">服ST.${p.outfitStage}</div>
+      `;
+      scoresGrid.appendChild(chip);
+
+      if (roster) {
+        const row = document.createElement('div');
+        row.innerHTML = `<b>${p.name}</b>：${p.points.toLocaleString()}点 / 衣装STAGE ${p.outfitStage}`;
+        roster.appendChild(row);
+      }
+    });
+
+    renderDoraCanvas();
+    renderHandCanvas();
+    updateCallButtons();
+  }
+
+  function openResultModal() {
+    const r = state.lastResult;
+    if (!r) return;
+    document.getElementById('result-title').textContent =
+      r.isMatchOver ? '🏁 全体勝負終了！（完全脱衣・ビリ確定）' :
+      r.type === 'agari' ? `🎉 ${r.winnerName} 和了（${r.methodName}）！` : `⚖ ${r.winnerName}（${r.methodName}）`;
+
+    const yakuHtml = r.yaku && r.yaku.length > 0
+      ? r.yaku.map(y => `<div>・${y.name}（${y.han}翻）</div>`).join('')
+      : '<div>・精算内容</div>';
+    const dressHtml = r.dressChanges.map(line => `<div>👗 ${line}</div>`).join('');
+
+    const standingsHtml = [...state.players]
+      .sort((a, b) => b.points - a.points)
+      .map((p, idx) => {
+        const isStrippedOut = p.seat === r.fullStripLoserSeat || p.outfitStage >= MAX_OUTFIT_STAGE;
+        return `<div>${idx + 1}位：<b>${p.name}</b> — ${p.points.toLocaleString()}点（衣装STAGE ${p.outfitStage}/${MAX_OUTFIT_STAGE}）${isStrippedOut ? '【全部脱いだ・ビリ確定】' : ''}</div>`;
+      })
+      .join('');
+
+    document.getElementById('result-body').innerHTML = `
+      <div style="font-size:13.5px;font-weight:900;color:var(--gold);">成立役・スコア：${r.totalHan > 0 ? `${r.totalHan}翻` : ''}</div>
+      <div style="font-size:12px;color:#ffffff;">${yakuHtml}</div>
+      <div style="font-size:12.5px;font-weight:900;color:#f9a8d4;margin-top:4px;">脱衣・着衣＆アイテム詳細：</div>
+      <div style="font-size:12px;color:#fde68a;display:flex;flex-direction:column;gap:3px;">${dressHtml}</div>
+      ${r.isMatchOver ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(251,113,133,0.4);font-size:11.5px;color:#fda4af;"><b>◆ 最終順位・結果：</b>${standingsHtml}</div>` : ''}
+    `;
+
+    const nextLabel = r.isMatchOver ? '新しい4人麻雀勝負を始める 🔄' : '次の局へ進む ▶';
+    document.getElementById('btn-result-next').innerHTML = `${nextLabel} <span class="kbadge">Enter</span>`;
+    document.getElementById('btn-result-next-top').textContent = r.isMatchOver ? '再戦する ▶' : '次の局へ ▶';
+    document.getElementById('result-screen').classList.add('active');
+  }
+
+  function proceedNextRound() {
+    document.getElementById('result-screen').classList.remove('active');
+    if (state.matchEndedByFullStrip || state.players.some(p => p.points <= 0)) {
+      showToast('全部脱いだプレイヤー（または持ち点0）が発生したため、全体勝負を終了＆新規対局を開始します！', 3200);
+      init4PlayerRound(true);
+      return;
+    }
+    state.roundIndex = (state.roundIndex + 1) % 4;
+    init4PlayerRound(false);
+  }
+
+  function launchDressScene(events, afterAction = 'result_modal') {
+    if (!Array.isArray(events) || events.length === 0) {
+      if (afterAction === 'result_modal') openResultModal();
+      return;
+    }
+    state.dressQueue = events;
+    state.dressIndex = 0;
+    state.dressAnimElapsedMs = 0;
+    state.afterDressAction = afterAction;
+    renderDressSceneStep();
+    const screen = document.getElementById('dress-scene-screen');
+    if (screen) screen.classList.add('active');
+    const curEv = state.dressQueue[0];
+    if (curEv.mode === 'undress') sfx.undressSound(!!curEv.isFullStrip);
+    else sfx.dressSound();
+  }
+
+  function renderDressSceneStep() {
+    const ev = state.dressQueue[state.dressIndex];
+    if (!ev) return;
+    const meta = SEAT_META[ev.seat] || SEAT_META[0];
+    const isUndress = ev.mode === 'undress';
+    const headline = document.getElementById('dress-item-headline');
+    const sub = document.getElementById('dress-detail-sub');
+    const prog = document.getElementById('dress-progress-bar');
+
+    if (headline) {
+      headline.textContent = isUndress
+        ? `🔥 ${meta.name} が【${ev.garmentName}】を脱いだ！`
+        : `✨ ${meta.name} が【${ev.garmentName}】を着た！`;
+    }
+    if (sub) {
+      const sign = ev.pointsDelta >= 0 ? `+${ev.pointsDelta.toLocaleString()}` : ev.pointsDelta.toLocaleString();
+      sub.textContent = `点棒変動：${sign}点 ｜ 衣装ステージ：STAGE ${ev.fromStage} → STAGE ${ev.toStage}${ev.isFullStrip ? '（全部脱いだ・ビリ確定！）' : ''}`;
+    }
+    if (prog) {
+      const rem = getRemainingGarments(ev.seat, ev.toStage);
+      prog.textContent = `演出 ${state.dressIndex + 1} / ${state.dressQueue.length} ｜ 残り着用アイテム：${rem.length > 0 ? rem.join(' / ') : 'なし（完全脱衣）'}`;
+    }
+  }
+
+  function advanceDressSceneStep() {
+    if (state.dressIndex + 1 < state.dressQueue.length) {
+      state.dressIndex++;
+      state.dressAnimElapsedMs = 0;
+      renderDressSceneStep();
+      const curEv = state.dressQueue[state.dressIndex];
+      if (curEv.mode === 'undress') sfx.undressSound(!!curEv.isFullStrip);
+      else sfx.dressSound();
+      return;
+    }
+
+    const screen = document.getElementById('dress-scene-screen');
+    if (screen) screen.classList.remove('active');
+    const nextAct = state.afterDressAction;
+    state.dressQueue = [];
+    state.dressIndex = 0;
+    state.afterDressAction = null;
+    if (nextAct === 'result_modal') {
+      openResultModal();
+    }
+  }
+
+  function render4PlayerStatusModal() {
+    const container = document.getElementById('status-4p-cards');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const ranked = [...state.players].sort((a, b) => {
+      const aStripped = a.outfitStage >= MAX_OUTFIT_STAGE || a.seat === state.fullStripLoserSeat;
+      const bStripped = b.outfitStage >= MAX_OUTFIT_STAGE || b.seat === state.fullStripLoserSeat;
+      if (aStripped !== bStripped) return aStripped ? 1 : -1;
+      return b.points - a.points;
+    });
+
+    ranked.forEach((p, rankIdx) => {
+      const meta = SEAT_META[p.seat] || SEAT_META[0];
+      const remList = getRemainingGarments(p.seat, p.outfitStage);
+      const remTxt = remList.length > 0 ? remList.join(' / ') : 'なし（全部脱いだ・ビリ確定）';
+      const isStripped = p.outfitStage >= MAX_OUTFIT_STAGE || p.seat === state.fullStripLoserSeat;
+      const rankLabel = isStripped ? '4位（ビリ確定）' : `${rankIdx + 1}位`;
+
+      const card = document.createElement('div');
+      card.className = 'card-panel';
+      card.style.borderColor = isStripped ? '#fb7185' : (p.isHuman ? '#facc15' : 'rgba(244,114,182,0.45)');
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="color:#fef08a;">${rankLabel}：${p.name}</strong>
+          <span style="font-size:11px;font-weight:900;color:#f9a8d4;">衣装 STAGE ${p.outfitStage}/${MAX_OUTFIT_STAGE}</span>
+        </div>
+        <div style="font-size:12px;color:#ffffff;margin-top:2px;">
+          持ち点：<b>${p.points.toLocaleString()}点</b> ${p.riichi ? '<span style="color:#fb7185;font-weight:900;">[立直中]</span>' : ''} ｜ 鳴き：${p.melds.length}副露 ｜ 手牌：${p.isHuman ? `${p.hand.length}枚` : `${p.hand.length}枚（裏牌）`}
+        </div>
+        <div style="font-size:11px;color:#7dd3fc;margin-top:3px;">
+          残りの服（${meta.garments.length - p.outfitStage}/${meta.garments.length}）：${remTxt}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function open4PlayerStatusModal() {
+    render4PlayerStatusModal();
+    const el = document.getElementById('status-4p-screen');
+    if (el) el.classList.add('active');
+  }
+
+  /* Save / Load / Delete Management */
+  function readSaves() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      return raw ? (JSON.parse(raw) || {}) : {};
+    } catch (_e) {
+      return {};
+    }
+  }
+
+  function writeSaves(obj) {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(obj));
+    } catch (_e) {
+      showToast('セーブデータの書き込みに失敗しました。');
+    }
+  }
+
+  function saveToSlot(slotNum) {
+    const now = new Date();
+    const ts = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const saves = readSaves();
+    saves[String(slotNum)] = {
+      slotNum,
+      roundLabel: getRoundTitle(),
+      roundIndex: state.roundIndex,
+      honba: state.honba,
+      potRiichiSticks: state.potRiichiSticks,
+      points: state.players.map(p => p.points),
+      outfitStages: state.players.map(p => p.outfitStage),
+      timestamp: ts
+    };
+    writeSaves(saves);
+    state.pendingDelSlot = null;
+    sfx.call();
+    showToast(`スロット ${slotNum} に4人麻雀データをセーブしました！`);
+    renderSaveSlots();
+  }
+
+  function loadFromSlot(slotNum) {
+    const saves = readSaves();
+    const d = saves[String(slotNum)];
+    if (!d) {
+      showToast('このスロットにデータはありません。');
+      return;
+    }
+    init4PlayerRound(false);
+    state.roundIndex = d.roundIndex || 0;
+    state.honba = d.honba || 0;
+    state.potRiichiSticks = d.potRiichiSticks || 0;
+    if (Array.isArray(d.points)) {
+      state.players.forEach((p, i) => {
+        if (typeof d.points[i] === 'number') p.points = d.points[i];
+      });
+    }
+    if (Array.isArray(d.outfitStages)) {
+      state.players.forEach((p, i) => {
+        if (typeof d.outfitStages[i] === 'number') p.outfitStage = d.outfitStages[i];
+      });
+    }
+    closeAllOverlays();
+    document.getElementById('title-screen').classList.remove('active');
+    updateAllUi();
+    sfx.call();
+    showToast(`スロット ${slotNum} から再開しました！`);
+  }
+
+  function deleteSingleSlot(slotNum) {
+    if (state.pendingDelSlot !== slotNum) {
+      state.pendingDelSlot = slotNum;
+      showToast(`もう一度「削除確定」を押すとスロット ${slotNum} を削除します。`);
+      renderSaveSlots();
+      return;
+    }
+    const saves = readSaves();
+    delete saves[String(slotNum)];
+    writeSaves(saves);
+    state.pendingDelSlot = null;
+    sfx.cursor();
+    showToast(`スロット ${slotNum} のセーブデータを削除しました。`);
+    renderSaveSlots();
+  }
+
+  function deleteAllSaves() {
+    if (!state.pendingPurgeAll) {
+      state.pendingPurgeAll = true;
+      const purgeBtn = document.getElementById('btn-delete-all-saves');
+      if (purgeBtn) purgeBtn.textContent = '⚠ 全セーブデータ削除確定（元に戻せません）';
+      showToast('確認：もう一度押すとすべてのセーブデータを削除します。');
+      return;
+    }
+    try {
+      localStorage.removeItem(SAVE_KEY);
+    } catch (_e) {
+      // Ignore
+    }
+    state.pendingPurgeAll = false;
+    state.pendingDelSlot = null;
+    const purgeBtn = document.getElementById('btn-delete-all-saves');
+    if (purgeBtn) purgeBtn.textContent = '🗑 すべてのセーブデータを削除する';
+    sfx.cursor();
+    showToast('すべてのセーブデータを削除しました。');
+    renderSaveSlots();
+  }
+
+  function openSaveModal(mode) {
+    state.saveMode = mode;
+    state.pendingDelSlot = null;
+    state.pendingPurgeAll = false;
+    const purgeBtn = document.getElementById('btn-delete-all-saves');
+    if (purgeBtn) purgeBtn.textContent = '🗑 すべてのセーブデータを削除する';
+    const titleEl = document.getElementById('save-title');
+    if (titleEl) {
+      titleEl.textContent = mode === 'save' ? '💾 セーブスロット選択' : '📂 ロード・セーブデータ削除';
+    }
+    renderSaveSlots();
+    const screenEl = document.getElementById('save-screen');
+    if (screenEl) screenEl.classList.add('active');
+  }
+
+  function renderSaveSlots() {
+    const list = document.getElementById('save-slots-list');
+    list.innerHTML = '';
+    const saves = readSaves();
+
+    for (let s = 1; s <= MAX_SLOTS; s++) {
+      const item = saves[String(s)];
+      const card = document.createElement('div');
+      card.className = 'card-panel';
+      card.style.display = 'flex';
+      card.style.flexDirection = 'column';
+      card.style.gap = '6px';
+
+      if (item) {
+        const armed = state.pendingDelSlot === s;
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="color:var(--gold);">SLOT ${s}：${item.roundLabel || '東1局'}</strong>
+            <span style="font-size:11px;color:var(--text-sub);">${item.timestamp}</span>
+          </div>
+          <div style="font-size:11px;color:#fbcfe8;">あなた: ${(item.points?.[0] ?? 25000).toLocaleString()}点 / 衣装ST.${item.outfitStages?.[0] ?? 0}</div>
+          <div style="display:flex;gap:6px;">
+            ${state.saveMode === 'save'
+              ? `<button type="button" class="mini-btn gold" style="flex:1;" data-op="save" data-s="${s}">💾 上書きセーブ</button>`
+              : `<button type="button" class="mini-btn gold" style="flex:1;" data-op="load" data-s="${s}">📂 ロード再開</button>`
+            }
+            <button type="button" class="mini-btn danger" data-op="del" data-s="${s}">${armed ? '⚠ 削除確定' : '🗑 削除'}</button>
+          </div>
+        `;
+      } else {
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="color:var(--text-sub);">SLOT ${s}：空きスロット</strong>
+            ${state.saveMode === 'save'
+              ? `<button type="button" class="mini-btn gold" data-op="save" data-s="${s}">💾 ここにセーブ</button>`
+              : `<span style="font-size:11px;color:#64748b;">データなし</span>`
+            }
+          </div>
+        `;
+      }
+
+      card.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+          const op = btn.dataset.op;
+          const sid = parseInt(btn.dataset.s, 10);
+          if (op === 'save') saveToSlot(sid);
+          else if (op === 'load') loadFromSlot(sid);
+          else if (op === 'del') deleteSingleSlot(sid);
+        };
+      });
+
+      list.appendChild(card);
+    }
+  }
+
+  function openGuideModal() {
+    document.getElementById('guide-body').innerHTML = `
+      <div><strong style="color:var(--gold);">◆ 厳格リーチ条件</strong><br>①門前（ポン・チー・明槓なし）②1,000点以上 ③山牌4枚以上 ④打牌後に待ち牌が存在（4面子1雀頭／七対子／国士無双）。条件を満たさない場合はリーチできません。</div>
+      <div><strong style="color:#f9a8d4;">◆ カン（暗槓・明槓・加槓）＆鳴き</strong><br>手牌4枚で暗槓、ポン済み牌への追加で加槓、他家捨て牌3枚持ちで明槓が可能。カン時は嶺上牌ツモ＆新ドラ表示が追加されます。</div>
+      <div><strong style="color:#7dd3fc;">◆ 点棒脱ぎ＆着せ替えルール</strong><br>アガリ精算時、点棒を支払う人は脱いで衣装ステージ+1、点棒を受け取る人は着て衣装ステージ-1（最小0）になります。</div>
+    `;
+    document.getElementById('guide-screen').classList.add('active');
+  }
+
+  function openMenuModal() {
+    document.getElementById('menu-screen').classList.add('active');
+  }
+
+  function isAnyOverlayOpen() {
+    return ['title-screen', 'dress-scene-screen', 'result-screen', 'status-4p-screen', 'save-screen', 'guide-screen', 'menu-screen'].some(id => {
+      const el = document.getElementById(id);
+      return el && el.classList.contains('active');
+    });
+  }
+
+  function closeAllOverlays() {
+    ['dress-scene-screen', 'result-screen', 'status-4p-screen', 'save-screen', 'guide-screen', 'menu-screen'].forEach(id => {
+      document.getElementById(id).classList.remove('active');
+    });
+    state.pendingDelSlot = null;
+    state.pendingPurgeAll = false;
+  }
+
+  function syncSoundLabels() {
+    const lbl = sfx.enabled ? '🔊 サウンド: ON' : '🔇 サウンド: OFF';
+    document.getElementById('btn-title-sound').innerHTML = `${lbl} <span class="kbadge">M</span>`;
+    document.getElementById('btn-menu-sound').textContent = `${lbl} [M]`;
+  }
+
+  /* =========================================================
+     10. TOUCH, POINTER & KEYBOARD BINDINGS
+     ========================================================= */
+  function bindClick(id, handler) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.onclick = handler;
+    }
+    return el;
+  }
+
+  const handCanvasEl = document.getElementById('hand-canvas');
+  if (handCanvasEl) {
+    handCanvasEl.addEventListener('pointerdown', (e) => {
+      const me = state.players[0];
+      if (!me || me.hand.length === 0) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      const count = me.hand.length;
+      const gap = 2;
+      const tileW = Math.min(34, Math.max(18, Math.floor((rect.width - gap * (count + 1)) / count)));
+      const totalW = count * tileW + (count - 1) * gap;
+      const startX = (rect.width - totalW) / 2;
+      const clickedIdx = Math.floor((relX - startX) / (tileW + gap));
+      if (clickedIdx >= 0 && clickedIdx < count) {
+        if (state.selectedIdx === clickedIdx && state.phase === 'player_discard') {
+          handlePlayerDiscard();
+        } else {
+          state.selectedIdx = clickedIdx;
+          sfx.cursor();
+          renderHandCanvas();
+          updateCallButtons();
+        }
+      }
+    });
+  }
+
+  bindClick('btn-left', () => moveHandCursor(-1));
+  bindClick('btn-right', () => moveHandCursor(1));
+  bindClick('btn-tap-discard', handlePlayerDiscard);
+  bindClick('btn-discard', handlePlayerDiscard);
+  bindClick('btn-tsumo', handlePlayerTsumo);
+  bindClick('btn-ron', handlePlayerRon);
+  bindClick('btn-riichi', handleToggleRiichiArm);
+  bindClick('btn-pon', handlePlayerPon);
+  bindClick('btn-chi', handlePlayerChi);
+  bindClick('btn-kan', handlePlayerKan);
+  bindClick('btn-pass', handlePassClaimWindow);
+  bindClick('btn-hud-4p-status', open4PlayerStatusModal);
+  bindClick('btn-4p-status', open4PlayerStatusModal);
+  bindClick('btn-close-4p-status', closeAllOverlays);
+  bindClick('btn-dress-skip', advanceDressSceneStep);
+  bindClick('btn-dress-next', advanceDressSceneStep);
+
+  bindClick('btn-save', () => openSaveModal('save'));
+  bindClick('btn-load', () => openSaveModal('load'));
+  bindClick('btn-guide', openGuideModal);
+  bindClick('btn-menu', openMenuModal);
+
+  bindClick('btn-start-4p', () => {
+    sfx.unlock();
+    sfx.call();
+    const titleEl = document.getElementById('title-screen');
+    if (titleEl) titleEl.classList.remove('active');
+    init4PlayerRound(true);
+  });
+
+  bindClick('btn-title-load', () => {
+    sfx.unlock();
+    openSaveModal('load');
+  });
+
+  bindClick('btn-title-guide', () => {
+    sfx.unlock();
+    openGuideModal();
+  });
+
+  bindClick('btn-title-sound', () => {
+    sfx.toggle();
+    syncSoundLabels();
+  });
+
+  bindClick('btn-title-del', () => {
+    sfx.unlock();
+    openSaveModal('load');
+    deleteAllSaves();
+  });
+
+  bindClick('btn-result-next', proceedNextRound);
+  bindClick('btn-result-next-top', proceedNextRound);
+
+  bindClick('btn-close-save', closeAllOverlays);
+  bindClick('btn-delete-all-saves', deleteAllSaves);
+  bindClick('btn-close-guide', closeAllOverlays);
+  bindClick('btn-close-menu', closeAllOverlays);
+
+  bindClick('btn-menu-sound', () => {
+    sfx.toggle();
+    syncSoundLabels();
+  });
+
+  bindClick('btn-menu-rematch', () => {
+    closeAllOverlays();
+    init4PlayerRound(true);
+    showToast('4人麻雀を初期状態（各25,000点）からやり直します！');
+  });
+
+  bindClick('btn-menu-title', () => {
+    closeAllOverlays();
+    const titleEl = document.getElementById('title-screen');
+    if (titleEl) titleEl.classList.add('active');
+  });
+
+  window.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+
+    if (k === 'm') {
+      sfx.toggle();
+      syncSoundLabels();
+      return;
+    }
+
+    if (k === 'escape') {
+      if (['status-4p-screen', 'save-screen', 'guide-screen', 'menu-screen'].some(id => document.getElementById(id).classList.contains('active'))) {
+        closeAllOverlays();
+      } else if (!document.getElementById('title-screen').classList.contains('active') && !document.getElementById('result-screen').classList.contains('active') && !document.getElementById('dress-scene-screen').classList.contains('active')) {
+        openMenuModal();
+      }
+      return;
+    }
+
+    if (document.getElementById('dress-scene-screen').classList.contains('active')) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        advanceDressSceneStep();
+      }
+      return;
+    }
+
+    if (document.getElementById('title-screen').classList.contains('active')) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        document.getElementById('btn-start-4p').click();
+      } else if (k === 'o') {
+        openSaveModal('load');
+      } else if (k === 'h') {
+        openGuideModal();
+      }
+      return;
+    }
+
+    if (document.getElementById('result-screen').classList.contains('active')) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        proceedNextRound();
+      }
+      return;
+    }
+
+    if (isAnyOverlayOpen()) return;
+
+    if (k === 'arrowleft' || k === 'a') {
+      e.preventDefault();
+      moveHandCursor(-1);
+    } else if (k === 'arrowright' || k === 'd') {
+      e.preventDefault();
+      moveHandCursor(1);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handlePlayerDiscard();
+    } else if (k === 't') {
+      handlePlayerTsumo();
+    } else if (k === 'r') {
+      handlePlayerRon();
+    } else if (k === 'l') {
+      handleToggleRiichiArm();
+    } else if (k === 'p') {
+      handlePlayerPon();
+    } else if (k === 'c') {
+      handlePlayerChi();
+    } else if (k === 'v') {
+      handlePlayerKan();
+    } else if (k === 'i') {
+      open4PlayerStatusModal();
+    } else if (k === 'k') {
+      openSaveModal('save');
+    } else if (k === 'o') {
+      openSaveModal('load');
+    } else if (k === 'h') {
+      openGuideModal();
+    }
+  });
+
+  // Initialize table preview & start render loop
+  init4PlayerRound(true);
+  document.getElementById('title-screen').classList.add('active');
+  requestAnimationFrame(renderLoop);
+})();
+</script>
+</body>
+</html>
