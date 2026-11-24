@@ -961,9 +961,36 @@
     melds.forEach(m => allTiles.push(...m.tiles));
     const allCodes = allTiles.map(t => t.code);
 
+    const isRinshan = !!opts.isRinshan && isTsumo;
+    const isHaitei = !!opts.isHaitei && isTsumo;
+    const isHoutei = !!opts.isHoutei && !isTsumo;
+    const isIppatsu = !!opts.isIppatsu && isRiichi;
+
+    // Pinfu helper (menzen, 4 shuntsu, non-yakuhai pair)
+    let hasPinfu = false;
+    if (yakuman === 0 && !isChiitoi && isStandard && isMenzen && melds.length === 0) {
+      const pairCandidates = [...new Set(concealedCodes.filter(c => concealedCodes.filter(x => x === c).length >= 2))];
+      const badPairCodes = new Set([35, 36, 37, roundWind, seatWind]);
+      for (const pc of pairCandidates) {
+        if (badPairCodes.has(pc)) continue;
+        const rem = [...concealedCodes];
+        rem.splice(rem.indexOf(pc), 1);
+        rem.splice(rem.indexOf(pc), 1);
+        if (canDecomposeMeldsAndPairs(rem, 4, 0)) {
+          hasPinfu = true;
+          break;
+        }
+      }
+    }
+
     if (yakuman === 0) {
       if (isRiichi && isMenzen) yaku.push({ name: '立直（リーチ）', han: 1 });
+      if (isIppatsu) yaku.push({ name: '一発', han: 1 });
       if (isTsumo && isMenzen) yaku.push({ name: '門前清自摸和', han: 1 });
+      if (isRinshan) yaku.push({ name: '嶺上開花', han: 1 });
+      if (isHaitei) yaku.push({ name: '海底撈月', han: 1 });
+      if (isHoutei) yaku.push({ name: '河底撈魚', han: 1 });
+      if (hasPinfu) yaku.push({ name: '平和（ピンフ）', han: 1 });
       if (allCodes.every(isSimpleCode)) yaku.push({ name: '断么九（タンヤオ）', han: 1 });
 
       // Yakuhai: White, Green, Red, Round wind, Seat wind
@@ -1013,19 +1040,34 @@
 
     const totalHan = yakuman > 0 ? 13 * yakuman : yaku.reduce((s, item) => s + item.han, 0);
 
+    // Fu (符) estimate for accurate point scaling
+    let fu = 30;
+    if (isChiitoi) {
+      fu = 25;
+    } else if (hasPinfu && isTsumo) {
+      fu = 20;
+    } else if (!isTsumo && isMenzen) {
+      fu = 40;
+    } else if (!isTsumo && !isMenzen) {
+      fu = 30;
+    }
+    const fuBoost = fu >= 40 ? 1.15 : (fu <= 20 ? 0.9 : 1.0);
+
     let base = 500;
     if (yakuman > 0) base = 8000 * yakuman;
     else if (totalHan >= 13) base = 8000;
     else if (totalHan >= 8) base = 6000;
     else if (totalHan >= 6) base = 4000;
     else if (totalHan >= 5) base = 3000;
-    else if (totalHan === 4) base = 2000;
-    else if (totalHan === 3) base = 1200;
-    else if (totalHan === 2) base = 800;
+    else if (totalHan === 4) base = Math.ceil((2000 * fuBoost) / 100) * 100;
+    else if (totalHan === 3) base = Math.ceil((1200 * fuBoost) / 100) * 100;
+    else if (totalHan === 2) base = Math.ceil((800 * fuBoost) / 100) * 100;
+    else base = Math.ceil((500 * fuBoost) / 100) * 100;
 
     return {
       yaku,
       totalHan,
+      fu,
       basePoints: base,
       isYakuman: yakuman > 0
     };
@@ -1083,7 +1125,11 @@
     });
     if (waits.length === 0) return false;
     const discardSet = new Set(player.river.map(t => t.code));
-    return waits.some(w => discardSet.has(w));
+    if (waits.some(w => discardSet.has(w))) return true;
+    if (Array.isArray(player.passedRonCodes) && player.passedRonCodes.some(c => waits.includes(c))) {
+      return true;
+    }
+    return false;
   }
 
   /* =========================================================
@@ -1162,6 +1208,9 @@
       melds: [],
       river: [],
       riichi: false,
+      ippatsuEligible: false,
+      lastDrawRinshan: false,
+      passedRonCodes: [],
       lastReaction: '対局開始！'
     }));
 
@@ -1182,6 +1231,7 @@
     if (isRinshan && state.rinshanWall.length > 0) {
       const t = state.rinshanWall.pop();
       player.hand.push(t);
+      player.lastDrawRinshan = true;
       const nextInd = state.wall.pop();
       if (nextInd) state.doraIndicators.push(nextInd.code);
       return t;
@@ -1189,6 +1239,7 @@
     if (state.wall.length === 0) return null;
     const t = state.wall.pop();
     player.hand.push(t);
+    player.lastDrawRinshan = false;
     return t;
   }
 
@@ -1559,6 +1610,21 @@
   function handlePassClaimWindow() {
     if (state.phase !== 'claim_window' || !state.pendingClaim) return;
     const fromSeat = state.pendingClaim.fromSeat;
+    const passedTile = state.pendingClaim.tile;
+    const me = state.players[0];
+    if (me && passedTile) {
+      const ronPossible = evaluate14Tiles([...me.hand, passedTile], me.melds, {
+        isTsumo: false,
+        isRiichi: me.riichi,
+        doraIndicators: state.doraIndicators,
+        roundWind: getRoundWind(),
+        seatWind: me.seatWind
+      });
+      if (ronPossible) {
+        me.passedRonCodes = me.passedRonCodes || [];
+        if (!me.passedRonCodes.includes(passedTile.code)) me.passedRonCodes.push(passedTile.code);
+      }
+    }
     state.pendingClaim = null;
     state.activeTurn = (fromSeat + 1) % 4;
     state.phase = 'ai_turn';
@@ -1566,13 +1632,80 @@
     setTimeout(stepAiTurn, 280);
   }
 
+  function evaluateAiRonForSeat(aiPlayer, tile) {
+    if (!aiPlayer || aiPlayer.isHuman) return null;
+    if (isPlayerFuriten(aiPlayer, getRoundWind())) return null;
+    return evaluate14Tiles([...aiPlayer.hand, tile], aiPlayer.melds, {
+      isTsumo: false,
+      isRiichi: aiPlayer.riichi,
+      isIppatsu: aiPlayer.ippatsuEligible,
+      isHoutei: state.wall.length === 0,
+      doraIndicators: state.doraIndicators,
+      roundWind: getRoundWind(),
+      seatWind: aiPlayer.seatWind
+    });
+  }
+
+  function chooseSafeAiDiscardIndex(aiPlayer) {
+    if (!aiPlayer || aiPlayer.hand.length === 0) return 0;
+    const doraTargets = new Set(state.doraIndicators.map(ind => nextDoraCode(ind)));
+    const dangerousCodes = new Set();
+    state.players.forEach(p => {
+      if (p.seat !== aiPlayer.seat && p.riichi) {
+        p.river.forEach(rt => dangerousCodes.add(rt.code));
+      }
+    });
+
+    let bestIdx = aiPlayer.hand.length - 1;
+    let bestScore = -9999;
+
+    aiPlayer.hand.forEach((t, idx) => {
+      let score = 0;
+      if (t.code >= 31) score += 65;
+      if (t.code < 31 && (t.code % 10 === 1 || t.code % 10 === 9)) score += 35;
+      if (doraTargets.has(t.code) || t.red) score -= 55;
+      if (dangerousCodes.has(t.code)) score -= 45;
+
+      // Avoid breaking pairs or adjacent sequences
+      const sameCount = aiPlayer.hand.filter(x => x.code === t.code).length;
+      if (sameCount >= 2) score -= 60;
+      if (t.code < 30) {
+        const hasAdj = aiPlayer.hand.some(x => x.code === t.code - 1 || x.code === t.code + 1);
+        if (hasAdj) score -= 25;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = idx;
+      }
+    });
+
+    return bestIdx;
+  }
+
   function checkRonOrCallAfterDiscard(discarderSeat, tile) {
+    // Check AI Ron in seat order starting next from discarder
+    for (let offset = 1; offset <= 3; offset++) {
+      const candidateSeat = (discarderSeat + offset) % 4;
+      const candPlayer = state.players[candidateSeat];
+      if (candPlayer && !candPlayer.isHuman) {
+        const aiRonEval = evaluateAiRonForSeat(candPlayer, tile);
+        if (aiRonEval) {
+          showToast(`⚡ ${candPlayer.name} が「${tileLabel(tile.code)}」でロン宣言！`, 2800);
+          finishRoundWithAgari(candidateSeat, discarderSeat, aiRonEval, `ロン（${tileLabel(tile.code)}）`);
+          return;
+        }
+      }
+    }
+
     if (discarderSeat !== 0) {
       const me = state.players[0];
       const canRon = !isPlayerFuriten(me, getRoundWind()) &&
         !!evaluate14Tiles([...me.hand, tile], me.melds, {
           isTsumo: false,
           isRiichi: me.riichi,
+          isIppatsu: me.ippatsuEligible,
+          isHoutei: state.wall.length === 0,
           doraIndicators: state.doraIndicators,
           roundWind: getRoundWind(),
           seatWind: me.seatWind
@@ -1619,21 +1752,41 @@
     const tsumoEv = evaluate14Tiles(p.hand, p.melds, {
       isTsumo: true,
       isRiichi: p.riichi,
+      isIppatsu: p.ippatsuEligible,
+      isRinshan: p.lastDrawRinshan,
+      isHaitei: state.wall.length === 0,
       doraIndicators: state.doraIndicators,
       roundWind: getRoundWind(),
       seatWind: p.seatWind
     });
     if (tsumoEv) {
-      finishRoundWithAgari(seat, null, tsumoEv, 'ツモ');
+      showToast(`🀄 ${p.name} が「${tileLabel(drawn.code)}」をツモアガリ！`, 2800);
+      finishRoundWithAgari(seat, null, tsumoEv, `ツモ（${tileLabel(drawn.code)}）`);
       return;
     }
 
-    p.hand.sort((a, b) => {
-      const sa = a.code >= 31 ? 100 : (a.code % 10 === 1 || a.code % 10 === 9 ? 50 : 10);
-      const sb = b.code >= 31 ? 100 : (b.code % 10 === 1 || b.code % 10 === 9 ? 50 : 10);
-      return sb - sa;
-    });
-    const outTile = p.hand.pop();
+    // Legal AI Riichi declaration when tenpai and eligible
+    if (!p.riichi && p.points >= 1000 && state.wall.length >= 4 && p.melds.every(m => m.concealed)) {
+      const legalRiichiIdxs = getLegalRiichiDiscardIndices(p, state.wall.length, getRoundWind());
+      if (legalRiichiIdxs.length > 0 && Math.random() < 0.75) {
+        const rIdx = legalRiichiIdxs[0];
+        p.points -= 1000;
+        state.potRiichiSticks += 1;
+        p.riichi = true;
+        p.ippatsuEligible = true;
+        sfx.riichi();
+        showToast(`🔴 ${p.name} がリーチ宣言！`);
+        const outRiichiTile = p.hand.splice(rIdx, 1)[0];
+        p.river.push(outRiichiTile);
+        sfx.clack();
+        checkRonOrCallAfterDiscard(seat, outRiichiTile);
+        return;
+      }
+    }
+
+    p.ippatsuEligible = false;
+    const discardIdx = chooseSafeAiDiscardIndex(p);
+    const outTile = p.hand.splice(discardIdx, 1)[0];
     p.river.push(outTile);
     sfx.clack();
 
